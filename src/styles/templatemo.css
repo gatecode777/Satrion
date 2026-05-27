@@ -1,0 +1,286 @@
+/*
+  Satrion - templatemo.css
+  Component & section-level overrides.
+  Headings are NOT forced white globally — that's handled per-section.
+*/
+
+/* =============================================
+   1. Typography — section-scoped
+   ============================================= */
+body,
+p,
+a,
+label,
+input,
+select,
+textarea {
+  font-family: var(--font-family);
+}
+
+/* Only headings INSIDE dark backgrounds go white */
+#tempaltemo_footer h1,
+#tempaltemo_footer h2,
+#tempaltemo_footer h3,
+#tempaltemo_footer h4,
+#tempaltemo_footer h5,
+#tempaltemo_footer h6,
+.glass-premium h1,
+.glass-premium h2,
+.glass-premium h3,
+.glass-premium h4,
+.glass-premium h5,
+.glass-premium h6 {
+  color: #ffffff;
+}
+
+/* Headings inside dark service section on home */
+.services-dark-section h2,
+.services-dark-section h3,
+.services-dark-section h4,
+.services-dark-section h5 {
+  color: #ffffff;
+}
+
+/* =============================================
+   2. Utility Overrides
+   ============================================= */
+.text-warning {
+  color: #f5a623 !important;
+}
+
+/* =============================================
+   3. Navbar
+   ============================================= */
+#templatemo_nav_top {
+  min-height: 36px;
+  background-color: #000 !important;
+}
+
+#templatemo_nav_top * {
+  font-size: 0.85em !important;
+  color: #a1a1a6 !important;
+}
+
+#templatemo_nav_top a:hover {
+  color: #fff !important;
+}
+
+#templatemo_main_nav a {
+  color: var(--text-primary);
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+#templatemo_main_nav a:hover {
+  color: var(--primary-color);
+}
+
+.navbar.shadow {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* =============================================
+   4. Hero Carousel
+   ============================================= */
+#hero-carousel img {
+  transition: transform 0.5s ease;
+}
+
+#hero-carousel .carousel-item.active img {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+/* =============================================
+   5. Product Cards (Shop page)
+   ============================================= */
+.product-wap {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s ease;
+  overflow: hidden;
+}
+
+.product-wap:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Hover overlay on product image */
+.card.product-wap .card .product-overlay {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(6px);
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+  border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+}
+
+.card.product-wap:hover .card .product-overlay {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* =============================================
+   6. Brand Carousel
+   ============================================= */
+.brand-img {
+  filter: grayscale(80%);
+  opacity: 0.55;
+  transition: all 0.4s ease;
+}
+
+.brand-img:hover {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+/* =============================================
+   7. Services Section (About page)
+   ============================================= */
+.services-icon-wap {
+  transition: all 0.3s ease;
+  border-radius: var(--border-radius-lg);
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  text-align: center;
+  padding: 40px 24px;
+}
+
+.services-icon-wap:hover {
+  transform: translateY(-10px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-color);
+}
+
+.services-icon-wap:hover i {
+  color: var(--neon-blue) !important;
+}
+
+/* =============================================
+   8. Footer
+   ============================================= */
+#tempaltemo_footer {
+  background-color: var(--footer-bg) !important;
+  color: var(--footer-text);
+  padding-top: 40px;
+}
+
+#tempaltemo_footer a {
+  color: var(--footer-text);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+#tempaltemo_footer a:hover {
+  color: #fff;
+}
+
+#tempaltemo_footer ul.footer-icons li {
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#tempaltemo_footer ul.footer-icons li:hover {
+  background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+  border-color: transparent;
+}
+
+#tempaltemo_footer ul.footer-icons li:hover i {
+  color: #fff;
+}
+
+#tempaltemo_footer .border-light {
+  border-color: #334155 !important;
+}
+
+/* =============================================
+   9. Pagination
+   ============================================= */
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pagination .page-item {
+  border: none;
+}
+
+.pagination .page-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50% !important;
+  margin: 0;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  font-weight: 600;
+  font-size: 1.05rem;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.pagination .page-link:hover {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+  border-color: #0f172a !important;
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2) !important;
+}
+
+.pagination .page-link.active {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+  color: #ffffff !important;
+  border-color: #0f172a !important;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25) !important;
+  font-weight: 700;
+}
+
+.pagination .page-item.disabled .page-link {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* =============================================
+   10. Responsive Logo
+   ============================================= */
+.logo {
+  font-weight: 700 !important;
+  letter-spacing: -1px;
+  width: 50%;
+}
+
+@media (min-width: 768px) {
+  .logo { width: 40%; }
+}
+
+@media (min-width: 992px) {
+  .logo { width: 25%; }
+}
+
+/* =============================================
+   11. Shop Category Sidebar
+   ============================================= */
+.shop-top-menu li {
+  list-style: none;
+}
+
+.shop-top-menu .btn {
+  transition: color 0.2s ease;
+}

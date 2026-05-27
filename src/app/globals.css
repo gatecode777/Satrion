@@ -1,0 +1,649 @@
+/* ============================================================
+   SATRION - Global Design System
+   Restored from original index.css + all premium styles
+   ============================================================ */
+
+/* ---- CSS Variables ---- */
+:root {
+  --primary-color: #000000;
+  --primary-hover: #333333;
+  --bg-color: #f8f9fa;
+  --surface-color: #ffffff;
+  --text-primary: #1a1a1a;
+  --text-secondary: #6c757d;
+  --border-color: #e5e5e5;
+  --footer-bg: #0f172a;
+  --footer-text: #f5f5f7;
+
+  /* Neon Accent Colors */
+  --neon-blue: #38bdf8;
+  --neon-indigo: #818cf8;
+  --neon-purple: #c084fc;
+  --neon-pink: #f472b6;
+
+  /* Border Radius */
+  --border-radius-sm: 8px;
+  --border-radius-md: 16px;
+  --border-radius-lg: 24px;
+
+  /* Shadows */
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
+
+  /* Typography */
+  --font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+}
+
+/* ---- Base Reset ---- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---- Typography ---- */
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: var(--font-family);
+    letter-spacing: -.5px;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+/* Bootstrap color overrides that inherit correctly */
+.text-dark {
+  color: var(--text-primary) !important;
+}
+
+.text-white {
+  color: #ffffff !important;
+}
+
+.text-muted {
+  color: var(--text-secondary) !important;
+}
+
+.text-warning {
+  color: #f5a623 !important;
+}
+
+.text-success {
+  color: #22c55e !important;
+}
+
+.text-light {
+  color: #f5f5f7 !important;
+}
+
+.text-info {
+  color: var(--neon-blue) !important;
+}
+
+.text-danger {
+  color: #ef4444 !important;
+}
+
+/* ---- Gradient Text ---- */
+.text-gradient-vibrant {
+  background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---- Background Overrides ---- */
+.bg-dark {
+  background-color: rgba(29, 29, 31, 0.95) !important;
+}
+
+.bg-light {
+  background-color: var(--bg-color) !important;
+}
+
+.bg-black {
+  background-color: #000000 !important;
+}
+
+.bg-success {
+  background-color: #22c55e !important;
+}
+
+/* ---- Glassmorphism Utilities ---- */
+/* Light glass (used on navbar, hero overlays) */
+.glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Dark premium glass (used on Login, Signup, Profile, dark sections) */
+.glass-premium {
+  background: rgba(15, 23, 42, 0.82) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6) !important;
+  color: #ffffff;
+}
+
+/* ---- Buttons ---- */
+.btn {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  font-family: var(--font-family);
+  letter-spacing: 0.2px;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-primary-gradient {
+  background: linear-gradient(145deg, #2b2b2b, #111111);
+  color: white !important;
+  border: none;
+  border-radius: var(--border-radius-md);
+  padding: 12px 24px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-primary-gradient:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  color: white !important;
+}
+
+/* Vibrant gradient button (Login, Signup, Profile) */
+.btn-vibrant-gradient {
+  background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+  color: white !important;
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-vibrant-gradient:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(129, 140, 248, 0.5);
+  color: white !important;
+}
+
+.btn-success {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  border-radius: var(--border-radius-md) !important;
+  font-weight: 500 !important;
+  padding: 10px 24px;
+  transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+  background-color: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
+  transform: translateY(-2px);
+}
+
+/* ---- Hover Effects ---- */
+.hover-lift {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ---- Navigation ---- */
+.nav-link {
+  font-weight: 600 !important;
+  font-size: 1.05rem;
+  color: var(--text-primary) !important;
+  transition: color 0.3s ease;
+  position: relative;
+  padding: 8px 16px !important;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 50%;
+  background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+
+.nav-link:hover {
+  color: #818cf8 !important;
+}
+
+.nav-link:hover::after {
+  width: 70%;
+}
+
+.nav-icon {
+  transition: all 0.3s ease;
+}
+
+.nav-icon:hover i {
+  color: #818cf8 !important;
+  transform: scale(1.15);
+  transition: all 0.2s ease;
+}
+
+/* ---- Marquee Banner ---- */
+@keyframes scrollText {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee-container {
+  overflow: hidden;
+  white-space: nowrap;
+  background-color: var(--surface-color);
+  padding: 12px 0;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.marquee-content {
+  display: inline-block;
+  animation: scrollText 30s linear infinite;
+}
+
+.marquee-content span {
+  display: inline-block;
+  padding: 0 40px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+}
+
+/* ---- Animations ---- */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.7s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(50px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.7); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+@keyframes pulseGlow {
+  0%   { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4); }
+  70%  { box-shadow: 0 0 0 12px rgba(56, 189, 248, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+}
+
+/* ---- Product Cards (Shop page) ---- */
+.product-wap {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s ease;
+  overflow: hidden;
+}
+
+.product-wap:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
+}
+
+.product-overlay {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(6px);
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+  border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+}
+
+.product-wap:hover .product-overlay {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* ---- Services Cards ---- */
+.services-icon-wap {
+  transition: all 0.3s ease;
+  border-radius: var(--border-radius-lg);
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  text-align: center;
+  padding: 40px 24px;
+}
+
+.services-icon-wap:hover {
+  transform: translateY(-10px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-color);
+}
+
+.services-icon-wap:hover i {
+  color: var(--neon-blue) !important;
+}
+
+/* ---- Brand Logo Carousel ---- */
+.brand-img {
+  filter: grayscale(80%);
+  opacity: 0.6;
+  transition: all 0.4s ease;
+}
+
+.brand-img:hover {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+/* ---- Footer ---- */
+.footer-hover {
+  transition: color 0.3s ease;
+  cursor: pointer;
+}
+
+.footer-hover:hover {
+  color: var(--neon-blue) !important;
+}
+
+.social-icon-btn {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.social-icon-btn:hover {
+  background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%) !important;
+  transform: translateY(-3px);
+  color: white !important;
+}
+
+/* ---- Pagination ---- */
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pagination .page-item {
+  border: none;
+}
+
+.pagination .page-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50% !important;
+  margin: 0;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  font-weight: 600;
+  font-size: 1.05rem;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.pagination .page-link:hover {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+  border-color: #0f172a !important;
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2) !important;
+}
+
+.pagination .page-link.active {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+  color: #ffffff !important;
+  border-color: #0f172a !important;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25) !important;
+  font-weight: 700;
+}
+
+.pagination .page-item.disabled .page-link {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* ---- Scrollbar Utilities ---- */
+.hide-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ---- Modal Scrollbar ---- */
+.modal-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.modal-container::-webkit-scrollbar-thumb {
+  background: #bc79e4;
+  border-radius: 10px;
+}
+
+.modal-container::-webkit-scrollbar-thumb:hover {
+  background: #a85bd8;
+}
+
+/* ---- Shop Sidebar Hover Link ---- */
+.hover-link {
+  color: var(--text-secondary) !important;
+  display: inline-block;
+  transition: all 0.2s ease;
+}
+
+.hover-link:hover {
+  color: #818cf8 !important;
+  transform: translateX(4px);
+}
+
+/* ---- Card Overrides ---- */
+.card {
+  border-radius: var(--border-radius-md);
+}
+
+/* Bootstrap .card has white bg by default — override for dark glass cards */
+.card.glass-premium {
+  background: rgba(15, 23, 42, 0.88) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 32px 64px -12px rgba(0, 0, 0, 0.7) !important;
+  color: #f1f5f9 !important;
+}
+
+.card.glass-premium h1,
+.card.glass-premium h2,
+.card.glass-premium h3,
+.card.glass-premium h4,
+.card.glass-premium h5,
+.card.glass-premium h6 {
+  color: #ffffff !important;
+}
+
+.card.glass-premium .text-muted {
+  color: #94a3b8 !important;
+}
+
+.card.glass-premium .text-light {
+  color: #e2e8f0 !important;
+}
+
+/* ---- Form Focus Glow (Login / Signup / Contact) ---- */
+.form-control:focus {
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25) !important;
+  border-color: var(--neon-blue) !important;
+}
+
+/* ---- Input Group on Dark (Login/Signup) ---- */
+.input-group-text.bg-dark,
+.input-group-text[class*='bg-dark'] {
+  background-color: #1e293b !important;
+  color: #94a3b8 !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  border-right: none !important;
+}
+
+.form-control.bg-dark,
+.form-control[class*='bg-dark'] {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  border-left: none !important;
+}
+
+.form-control.bg-dark::placeholder,
+.form-control[class*='bg-dark']::placeholder {
+  color: #64748b;
+}
+
+.form-control.bg-dark:focus,
+.form-control[class*='bg-dark']:focus {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  border-color: rgba(56, 189, 248, 0.5) !important;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2) !important;
+  outline: none !important;
+}
+
+/* Ensure input group stays together visually on dark */
+.card.glass-premium .input-group {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.card.glass-premium .input-group .input-group-text {
+  border: none !important;
+}
+
+.card.glass-premium .input-group .form-control {
+  border: none !important;
+}
+
+/* ---- Profile Nav Pill Active ---- */
+.nav-pills .nav-link.active {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-left: 4px solid var(--neon-blue);
+}
+
+/* ---- Spinner ---- */
+.spinner-border.text-info {
+  color: var(--neon-blue) !important;
+}
+
+/* ---- Badge Overrides ---- */
+.badge.bg-secondary {
+  background-color: #475569 !important;
+  color: #e2e8f0;
+}
+
+/* ---- Logo ---- */
+.logo {
+  font-weight: 700 !important;
+  letter-spacing: -1px;
+}
+
+@media (max-width: 768px) {
+  .logo {
+    width: 50%;
+  }
+}
+
+@media (min-width: 769px) {
+  .logo {
+    width: 40%;
+  }
+}
+
+@media (min-width: 992px) {
+  .logo {
+    width: 25%;
+  }
+}
+
+/* ---- Responsive Hero Carousel ---- */
+#hero-carousel .carousel-item {
+  min-height: 400px;
+}
+
+@media (min-width: 992px) {
+  #hero-carousel .carousel-item {
+    min-height: 600px;
+  }
+}
+
+/* ---- Cart / Checkout ---- */
+.modal-overlay {
+  animation: fadeIn 0.25s ease-in;
+}
+
+.modal-container {
+  animation: slideUp 0.25s ease-out;
+}
+
+/* ---- Active Tab Highlight (Profile) ---- */
+.profile-tab-active {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-left: 4px solid var(--neon-blue) !important;
+  font-weight: 600 !important;
+}
