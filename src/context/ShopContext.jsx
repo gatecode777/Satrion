@@ -232,6 +232,57 @@ export const ShopProvider = ({ children }) => {
     }
   };
 
+  const moveWishlistToCart = async (product) => {
+    if (!user) {
+      toast.warning(`Please login to add ${product.name} to Cart!`);
+      setIsLoginModalOpen(true);
+      return;
+    }
+
+    // 1. Add to cart logic (silent/no toast from addToCart)
+    let updatedCart = [];
+    const existingItemIndex = cart.findIndex((item) => item.product.id === product.id);
+    if (existingItemIndex > -1) {
+      updatedCart = cart.map((item, idx) => 
+        idx === existingItemIndex ? { ...item, quantity: item.quantity + 1 } : item
+      );
+    } else {
+      updatedCart = [...cart, { product, quantity: 1 }];
+    }
+    setCart(updatedCart);
+
+    // 2. Remove from wishlist logic
+    const updatedWishlist = wishlist.filter((item) => item.id !== product.id);
+    setWishlist(updatedWishlist);
+
+    // 3. Show one unified success toast
+    toast.success(`Moved ${product.name} to Cart!`);
+
+    // 4. Sync both to database in parallel
+    try {
+      await Promise.all([
+        fetch(`${API_URL}/user/cart`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ cart: updatedCart })
+        }),
+        fetch(`${API_URL}/user/wishlist`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ wishlist: updatedWishlist })
+        })
+      ]);
+    } catch (err) {
+      console.error('Failed to sync move to cart:', err);
+    }
+  };
+
   // Auth actions
   const loginUser = async (email, password) => {
     try {
@@ -312,6 +363,57 @@ export const ShopProvider = ({ children }) => {
         phone: data.phone
       }));
       toast.success('Profile updated successfully!');
+      return true;
+    } catch (error) {
+      toast.error(error.message);
+      return false;
+    }
+  };
+
+  // Change user password
+  const changePassword = async (currentPassword, newPassword) => {
+    try {
+      const res = await fetch(`${API_URL}/auth/password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Failed to update password');
+      }
+
+      toast.success('Password updated successfully!');
+      return true;
+    } catch (error) {
+      toast.error(error.message);
+      return false;
+    }
+  };
+
+  // Delete user account
+  const deleteAccount = async () => {
+    try {
+      const res = await fetch(`${API_URL}/auth/profile`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Failed to delete account');
+      }
+
+      logoutUser();
+      toast.success('Account deleted successfully!');
       return true;
     } catch (error) {
       toast.error(error.message);
@@ -549,10 +651,13 @@ export const ShopProvider = ({ children }) => {
         updateCartQuantity,
         clearCart,
         toggleWishlist,
+        moveWishlistToCart,
         loginUser,
         signupUser,
         logoutUser,
         updateProfile,
+        changePassword,
+        deleteAccount,
         addAddress,
         updateAddress,
         deleteAddress,

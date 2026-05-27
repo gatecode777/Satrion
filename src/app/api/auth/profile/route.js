@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import User from '@/models/User';
+import Order from '@/models/Order';
 import { protect } from '@/lib/auth';
 
 export async function GET(req) {
@@ -55,5 +56,26 @@ export async function PUT(req) {
   } catch (error) {
     console.error('Profile PUT Route Error:', error);
     return NextResponse.json({ message: error.message || 'Server error' }, { status: 401 });
+  }
+}
+
+export async function DELETE(req) {
+  try {
+    const authorizedUser = await protect(req);
+    const user = await User.findById(authorizedUser._id);
+
+    if (user) {
+      // Delete user's order history to prevent orphaned records in database
+      await Order.deleteMany({ userId: authorizedUser._id });
+      // Delete user account
+      await User.deleteOne({ _id: authorizedUser._id });
+
+      return NextResponse.json({ message: 'Account deleted successfully' });
+    } else {
+      return NextResponse.json({ message: 'User not found' }, { status: 404 });
+    }
+  } catch (error) {
+    console.error('Profile DELETE Route Error:', error);
+    return NextResponse.json({ message: error.message || 'Server error during account deletion' }, { status: 500 });
   }
 }

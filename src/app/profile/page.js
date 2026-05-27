@@ -6,7 +6,7 @@ import { useShop } from '../../context/ShopContext';
 import { toast } from 'react-toastify';
 
 const Profile = () => {
-  const { user, updateProfile, addAddress, updateAddress, deleteAddress, logoutUser, loading, requestReturn, requestExchange } = useShop();
+  const { user, updateProfile, addAddress, updateAddress, deleteAddress, logoutUser, loading, requestReturn, requestExchange, changePassword, deleteAccount } = useShop();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -90,6 +90,13 @@ const Profile = () => {
   const [editingAddressId, setEditingAddressId] = useState(null);
   const [showAddressForm, setShowAddressForm] = useState(false);
 
+  // Form states for password change & deletion
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+
   // Redirect to login if user is not logged in
   useEffect(() => {
     if (loading) return;
@@ -118,6 +125,50 @@ const Profile = () => {
   if (!user) {
     return null;
   }
+
+  // Handle password change submit
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast.error('All password fields are required');
+      return;
+    }
+    if (newPassword.length < 6) {
+      toast.error('New password must be at least 6 characters long');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error('New passwords do not match');
+      return;
+    }
+    if (currentPassword === newPassword) {
+      toast.error('New password must be different from current password');
+      return;
+    }
+
+    setIsChangingPassword(true);
+    const success = await changePassword(currentPassword, newPassword);
+    setIsChangingPassword(false);
+
+    if (success) {
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    }
+  };
+
+  // Handle delete account click
+  const handleDeleteAccountClick = async () => {
+    const confirmDelete = window.confirm('Are you sure you want to permanently delete your account? This action is irreversible and will erase all your profile data and order history.');
+    if (confirmDelete) {
+      setIsDeletingAccount(true);
+      const success = await deleteAccount();
+      setIsDeletingAccount(false);
+      if (success) {
+        router.push('/login');
+      }
+    }
+  };
 
   // Handle profile update
   const handleProfileSubmit = (e) => {
@@ -257,6 +308,18 @@ const Profile = () => {
                   }}
                 >
                   <i className="fas fa-map-marker-alt me-3 text-danger"></i> Addresses
+                </button>
+
+                <button 
+                  onClick={() => setActiveTab('settings')}
+                  className={`nav-link text-white text-start d-flex align-items-center py-3 px-4 border-0 rounded-3 transition ${activeTab === 'settings' ? 'bg-dark' : 'bg-transparent'}`}
+                  style={{ 
+                    background: activeTab === 'settings' ? 'rgba(255, 255, 255, 0.08) !important' : 'transparent',
+                    borderLeft: activeTab === 'settings' ? '4px solid #06b6d4' : '4px solid transparent',
+                    fontWeight: activeTab === 'settings' ? '600' : 'normal'
+                  }}
+                >
+                  <i className="fas fa-cog me-3" style={{ color: '#06b6d4' }}></i> Settings
                 </button>
 
                 <button 
@@ -560,6 +623,94 @@ const Profile = () => {
                         </div>
                       ))
                     )}
+                  </div>
+                </div>
+              )}
+
+              {/* Tab 4: Settings */}
+              {activeTab === 'settings' && (
+                <div>
+                  <h3 className="fw-bold mb-2">Account Settings</h3>
+                  <p className="text-muted small mb-4">Manage your password settings and account status</p>
+                  
+                  {/* Change Password Section */}
+                  <form onSubmit={handlePasswordSubmit} className="mb-5">
+                    <h5 className="fw-bold mb-3 text-info"><i className="fas fa-key me-2"></i> Change Password</h5>
+                    <div className="row g-4">
+                      <div className="col-md-4">
+                        <label className="form-label small fw-bold text-muted">Current Password</label>
+                        <div className="input-group">
+                          <span className="input-group-text bg-dark border-0 text-muted"><i className="fas fa-lock"></i></span>
+                          <input 
+                            type="password" 
+                            value={currentPassword} 
+                            onChange={(e) => setCurrentPassword(e.target.value)}
+                            className="form-control bg-dark border-0 text-white shadow-none px-3 py-2" 
+                            placeholder="Current Password"
+                            required
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="col-md-4">
+                        <label className="form-label small fw-bold text-muted">New Password (min. 6 characters)</label>
+                        <div className="input-group">
+                          <span className="input-group-text bg-dark border-0 text-muted"><i className="fas fa-key"></i></span>
+                          <input 
+                            type="password" 
+                            value={newPassword} 
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            className="form-control bg-dark border-0 text-white shadow-none px-3 py-2" 
+                            placeholder="New Password"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="col-md-4">
+                        <label className="form-label small fw-bold text-muted">Confirm New Password</label>
+                        <div className="input-group">
+                          <span className="input-group-text bg-dark border-0 text-muted"><i className="fas fa-check-circle"></i></span>
+                          <input 
+                            type="password" 
+                            value={confirmPassword} 
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            className="form-control bg-dark border-0 text-white shadow-none px-3 py-2" 
+                            placeholder="Confirm New Password"
+                            required
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="col-12 mt-4 pt-2">
+                        <button type="submit" disabled={isChangingPassword} className="btn btn-vibrant-gradient px-4 py-2 fw-bold rounded-pill">
+                          {isChangingPassword ? 'Updating...' : 'Update Password'} <i className="fas fa-key ms-2"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+
+                  <hr className="my-5" style={{ borderColor: 'rgba(255,255,255,0.1)' }} />
+
+                  {/* Danger Zone: Delete Account */}
+                  <div className="p-4 rounded-4 text-start" style={{ backgroundColor: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                    <h5 className="fw-bold mb-3 text-danger"><i className="fas fa-exclamation-triangle me-2"></i> Danger Zone</h5>
+                    <p className="text-muted small mb-4">
+                      Once you delete your account, there is no going back. All of your saved addresses, cart items, wishlist details, and past mock orders will be permanently wiped from our database.
+                    </p>
+                    <button 
+                      type="button" 
+                      onClick={handleDeleteAccountClick}
+                      disabled={isDeletingAccount}
+                      className="btn btn-danger px-4 py-2.5 fw-bold rounded-pill"
+                      style={{ 
+                        background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', 
+                        border: 'none',
+                        boxShadow: '0 0 15px rgba(239, 68, 68, 0.3)'
+                      }}
+                    >
+                      {isDeletingAccount ? 'Deleting Account...' : 'Delete Account'} <i className="fas fa-trash-alt ms-2"></i>
+                    </button>
                   </div>
                 </div>
               )}

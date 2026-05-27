@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useShop } from '../../context/ShopContext';
 
 const Wishlist = () => {
-  const { wishlist, toggleWishlist, addToCart } = useShop();
+  const { wishlist, toggleWishlist, moveWishlistToCart } = useShop();
 
   const getCleanImageUrl = (img) => {
     if (!img) return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="100%" height="100%" fill="%23f8f9fa"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="16" fill="%236c757d">No Image Available</text></svg>';
@@ -14,8 +14,7 @@ const Wishlist = () => {
   };
 
   const handleMoveToCart = (product) => {
-    addToCart(product);
-    toggleWishlist(product); // Remove from wishlist after adding to cart
+    moveWishlistToCart(product);
   };
 
   return (

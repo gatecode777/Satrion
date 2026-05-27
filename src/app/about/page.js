@@ -1,19 +1,18 @@
-"use client";
-
-import React, { useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 
-const About = () => {
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      window.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: 'instant'
-      });
-    }
-  }, []);
+export const metadata = {
+  title: 'About Us - Satrion Shop',
+  description: 'Learn more about Satrion. We are dedicated to providing premium gaming hardware, custom PCs, and precision accessories.',
+  openGraph: {
+    title: 'About Us - Satrion Shop',
+    description: 'Learn more about Satrion. We are dedicated to providing premium gaming hardware, custom PCs, and precision accessories.',
+    type: 'website',
+    url: 'https://satrion.in/about',
+  }
+};
 
+const About = () => {
   return (
     <main>
       {/* About Banner Section */}
@@ -37,10 +36,7 @@ const About = () => {
               </div>
             </div>
             <div className="col-lg-6 position-relative">
-              <div className="glass-premium p-2" style={{ borderRadius: '30px', transform: 'perspective(1000px) rotateY(-5deg)', boxShadow: '0 30px 60px rgba(0,0,0,0.5)', transition: 'transform 0.5s ease' }}
-                onMouseEnter={(e) => e.currentTarget.style.transform = 'perspective(1000px) rotateY(0deg) translateY(-10px)'}
-                onMouseLeave={(e) => e.currentTarget.style.transform = 'perspective(1000px) rotateY(-5deg) translateY(0)'}
-              >
+              <div className="glass-premium p-2 about-hero-card">
                 <img src="/about-hero-premium.png" alt="Premium Tech Office" className="img-fluid" style={{ borderRadius: '24px' }} />
               </div>
             </div>
@@ -118,9 +114,6 @@ const About = () => {
                     href="#templatemo-slide-brand"
                     role="button"
                     data-bs-slide="prev"
-                    onClick={(e) => {
-                      e.preventDefault();
-                    }}
                   >
                     <i className="text-dark fas fa-chevron-left"></i>
                   </a>
@@ -271,9 +264,6 @@ const About = () => {
                     href="#templatemo-slide-brand"
                     role="button"
                     data-bs-slide="next"
-                    onClick={(e) => {
-                      e.preventDefault();
-                    }}
                   >
                     <i className="text-dark fas fa-chevron-right"></i>
                   </a>

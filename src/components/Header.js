@@ -117,22 +117,37 @@ const Header = () => {
                 </li>
               </ul>
             </div>
-            <div className="navbar align-self-center d-flex">
-              <div className="d-lg-none flex-sm-fill mt-3 mb-4 col-7 col-sm-auto pr-3">
+            <div className="navbar align-self-center d-flex align-items-center gap-4">
+              <form action="/shop" method="get" className="d-lg-none flex-sm-fill mt-3 mb-4 col-7 col-sm-auto pr-3">
                 <div className="input-group">
-                  <input type="text" className="form-control" id="inputMobileSearch" placeholder="Search ..." />
-                  <div className="input-group-text">
+                  <input 
+                    type="text" 
+                    name="q"
+                    className="form-control text-dark bg-light border" 
+                    id="inputMobileSearch" 
+                    placeholder="Search ..." 
+                    aria-label="Search products"
+                    style={{ minHeight: '44px' }}
+                  />
+                  <button type="submit" className="input-group-text bg-dark border-0 text-white" aria-label="Submit Search" style={{ cursor: 'pointer' }}>
                     <i className="fa fa-fw fa-search"></i>
-                  </div>
+                  </button>
                 </div>
-              </div>
+              </form>
               <button
-                className="nav-icon d-none d-lg-inline bg-transparent border-0"
+                className="nav-icon d-none d-lg-inline bg-transparent border-0 p-0"
                 onClick={() => setIsSearchModalOpen(true)}
+                aria-label="Search"
+                title="Search"
               >
-                <i className="fa fa-fw fa-search text-dark mr-2"></i>
+                <i className="fa fa-fw fa-search text-dark"></i>
               </button>
-              <Link className="nav-icon position-relative text-decoration-none me-3" href="/wishlist">
+              <Link 
+                className="nav-icon position-relative text-decoration-none" 
+                href="/wishlist"
+                aria-label="Wishlist"
+                title="Wishlist"
+              >
                 <i className="fa fa-fw fa-heart text-dark"></i>
                 {wishlist.length > 0 && (
                   <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger text-white" style={{ fontSize: '0.65rem', padding: '3px 6px' }}>
@@ -140,7 +155,12 @@ const Header = () => {
                   </span>
                 )}
               </Link>
-              <Link className="nav-icon position-relative text-decoration-none me-3" href="/cart">
+              <Link 
+                className="nav-icon position-relative text-decoration-none" 
+                href="/cart"
+                aria-label="Shopping Cart"
+                title="Shopping Cart"
+              >
                 <i className="fa fa-fw fa-cart-arrow-down text-dark"></i>
                 {cartCount > 0 && (
                   <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger text-white" style={{ fontSize: '0.65rem', padding: '3px 6px' }}>
@@ -149,11 +169,21 @@ const Header = () => {
                 )}
               </Link>
               {user && user.isAdmin && (
-                <Link className="nav-icon position-relative text-decoration-none me-3" href="/admin" title="Admin Panel">
+                <Link 
+                  className="nav-icon position-relative text-decoration-none" 
+                  href="/admin" 
+                  title="Admin Panel"
+                  aria-label="Admin Panel"
+                >
                   <i className="fa fa-fw fa-cog text-dark"></i>
                 </Link>
               )}
-              <Link className="nav-icon position-relative text-decoration-none" href={user ? "/profile" : "/login"}>
+              <Link 
+                className="nav-icon position-relative text-decoration-none" 
+                href={user ? "/profile" : "/login"}
+                aria-label={user ? "Profile" : "Login"}
+                title={user ? "Profile" : "Login"}
+              >
                 <i className="fa fa-fw fa-user text-dark"></i>
               </Link>
             </div>

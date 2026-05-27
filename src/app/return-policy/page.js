@@ -1,7 +1,16 @@
-"use client";
-
 import React from 'react';
 import Link from 'next/link';
+
+export const metadata = {
+  title: 'Refund & Return Policy - Satrion Shop',
+  description: 'Refund & Return Policy for Satrion. Learn about our 7-day return window and the simple step-by-step refund process.',
+  openGraph: {
+    title: 'Refund & Return Policy - Satrion Shop',
+    description: 'Refund & Return Policy for Satrion. Learn about our 7-day return window and the simple step-by-step refund process.',
+    type: 'website',
+    url: 'https://satrion.in/return-policy',
+  }
+};
 
 export default function ReturnPolicy() {
   return (

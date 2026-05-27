@@ -54,6 +54,25 @@ body {
 }
 
 /* ---- Typography ---- */
+h1, .h1 {
+  font-size: clamp(2rem, 1.2rem + 4vw, 3.5rem) !important;
+}
+h2, .h2 {
+  font-size: clamp(1.6rem, 1.1rem + 2.5vw, 2.75rem) !important;
+}
+h3, .h3 {
+  font-size: clamp(1.4rem, 1rem + 2vw, 2.25rem) !important;
+}
+h4, .h4 {
+  font-size: clamp(1.2rem, 0.95rem + 1.25vw, 1.75rem) !important;
+}
+h5, .h5 {
+  font-size: clamp(1rem, 0.85rem + 0.75vw, 1.35rem) !important;
+}
+h6, .h6 {
+  font-size: clamp(0.9rem, 0.8rem + 0.5vw, 1.1rem) !important;
+}
+
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     font-family: var(--font-family);
     letter-spacing: -.5px;
@@ -646,4 +665,52 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
   background: rgba(255, 255, 255, 0.08) !important;
   border-left: 4px solid var(--neon-blue) !important;
   font-weight: 600 !important;
+}
+
+/* ---- Container Max Widths for Ultra-wide Screens ---- */
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1320px !important;
+  }
+}
+@media (min-width: 1800px) {
+  .container {
+    max-width: 1440px !important;
+  }
+}
+@media (min-width: 2200px) {
+  .container {
+    max-width: 1600px !important;
+  }
+}
+
+/* ---- Touch Target & Spacing Improvements for Mobile ---- */
+@media (max-width: 576px) {
+  .btn, .form-control, select, textarea {
+    min-height: 44px; /* Optimal minimum touch target height */
+  }
+  .modal-container {
+    width: 95% !important;
+    padding: 20px !important;
+  }
+  .modal-container .row {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .modal-container [class*="col-"] {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+/* ---- About Hero Card Animation ---- */
+.about-hero-card {
+  border-radius: 30px;
+  transform: perspective(1000px) rotateY(-5deg);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+  transition: transform 0.5s ease;
+}
+
+.about-hero-card:hover {
+  transform: perspective(1000px) rotateY(0deg) translateY(-10px) !important;
 }

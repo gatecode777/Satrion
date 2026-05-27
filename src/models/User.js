@@ -12,7 +12,7 @@ const AddressSchema = new mongoose.Schema({
 
 const CartItemSchema = new mongoose.Schema({
   product: {
-    id: { type: Number, required: true },
+    id: { type: String, required: true },
     name: { type: String, required: true },
     price: { type: String, required: true },
     description: { type: String },
@@ -23,7 +23,7 @@ const CartItemSchema = new mongoose.Schema({
 }, { _id: false });
 
 const WishlistItemSchema = new mongoose.Schema({
-  id: { type: Number, required: true },
+  id: { type: String, required: true },
   name: { type: String, required: true },
   price: { type: String, required: true },
   description: { type: String },

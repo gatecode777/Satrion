@@ -1,7 +1,16 @@
-"use client";
-
 import React from 'react';
 import Link from 'next/link';
+
+export const metadata = {
+  title: 'Privacy Policy - Satrion Shop',
+  description: 'Privacy Policy for Satrion. This document explains how we collect, protect, and use your personal data.',
+  openGraph: {
+    title: 'Privacy Policy - Satrion Shop',
+    description: 'Privacy Policy for Satrion. This document explains how we collect, protect, and use your personal data.',
+    type: 'website',
+    url: 'https://satrion.in/privacy-policy',
+  }
+};
 
 export default function PrivacyPolicy() {
   return (

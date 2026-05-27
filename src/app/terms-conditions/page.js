@@ -1,7 +1,16 @@
-"use client";
-
 import React from 'react';
 import Link from 'next/link';
+
+export const metadata = {
+  title: 'Terms & Conditions - Satrion Shop',
+  description: 'Terms & Conditions for Satrion. Review website usage guidelines, payment policies, warranties, and legal jurisdictions.',
+  openGraph: {
+    title: 'Terms & Conditions - Satrion Shop',
+    description: 'Terms & Conditions for Satrion. Review website usage guidelines, payment policies, warranties, and legal jurisdictions.',
+    type: 'website',
+    url: 'https://satrion.in/terms-conditions',
+  }
+};
 
 export default function TermsConditions() {
   return (
