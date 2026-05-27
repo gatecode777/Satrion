@@ -1,6 +1,4 @@
 import { NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
 
 // POST /api/upload — accepts a multipart/form-data file upload
 export async function POST(req) {
@@ -26,19 +24,12 @@ export async function POST(req) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Generate unique filename
-    const ext = path.extname(file.name) || '.jpg';
-    const uniqueName = `upload_${Date.now()}_${Math.random().toString(36).slice(2)}${ext}`;
+    // Convert file to base64 Data URL
+    const base64Data = buffer.toString('base64');
+    const dataUrl = `data:${file.type};base64,${base64Data}`;
 
-    // Ensure /public/uploads/ directory exists
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-    await mkdir(uploadDir, { recursive: true });
-
-    const filePath = path.join(uploadDir, uniqueName);
-    await writeFile(filePath, buffer);
-
-    // Return the public URL path
-    return NextResponse.json({ url: `/uploads/${uniqueName}` });
+    // Return the data URL
+    return NextResponse.json({ url: dataUrl });
   } catch (error) {
     console.error('Upload error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
