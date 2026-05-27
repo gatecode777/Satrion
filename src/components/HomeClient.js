@@ -37,22 +37,14 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
     }
 
     // Filter products locally for the sections
-    const featured = initialProducts.filter(p => p.homepageSection === 'Featured Products').slice(0, 6);
-    setFeaturedProducts(featured.length > 0 ? featured : initialProducts.filter(p => p.isFeatured).slice(0, 6));
+    const featured = initialProducts.filter(p => p.homepageSection === 'Featured Products' && p.isActive !== false).slice(0, 6);
+    setFeaturedProducts(featured);
 
-    const bestsellers = initialProducts.filter(p => p.homepageSection === 'Bestsellers').slice(0, 6);
-    setBestsellerProducts(bestsellers.length > 0 ? bestsellers : initialProducts.slice(0, 6));
+    const bestsellers = initialProducts.filter(p => p.homepageSection === 'Bestsellers' && p.isActive !== false).slice(0, 6);
+    setBestsellerProducts(bestsellers);
 
-    const gaming = initialProducts.filter(p => p.homepageSection === 'Our Range of Gaming Products').slice(0, 6);
-    const gamingFallback = initialProducts.filter(p =>
-      p.category && (
-        p.category.toLowerCase().includes('accessories') ||
-        p.category.toLowerCase().includes('gaming') ||
-        p.category.toLowerCase().includes('keyboard') ||
-        p.category.toLowerCase().includes('mouse')
-      )
-    ).slice(0, 6);
-    setGamingProducts(gaming.length > 0 ? gaming : (gamingFallback.length > 0 ? gamingFallback : initialProducts.slice(3, 9)));
+    const gaming = initialProducts.filter(p => p.homepageSection === 'Our Range of Gaming Products' && p.isActive !== false).slice(0, 6);
+    setGamingProducts(gaming);
   }, [initialProducts]);
 
   const renderStars = (rating = 5) => {

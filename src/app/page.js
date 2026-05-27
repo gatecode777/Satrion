@@ -4,6 +4,8 @@ import Product from '@/models/Product';
 import Category from '@/models/Category';
 import HomeClient from '@/components/HomeClient';
 
+export const dynamic = 'force-dynamic';
+
 // Server-rendered metadata for search engine indexing
 export const metadata = {
   title: 'Satrion Shop - Premium Gaming Gear & Custom PCs',

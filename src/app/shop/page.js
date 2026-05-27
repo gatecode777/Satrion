@@ -4,6 +4,8 @@ import Product from '@/models/Product';
 import Category from '@/models/Category';
 import ShopClient from '@/components/ShopClient';
 
+export const dynamic = 'force-dynamic';
+
 // Dynamic SEO metadata based on search parameters
 export async function generateMetadata({ searchParams }) {
   const resolvedParams = await searchParams;
