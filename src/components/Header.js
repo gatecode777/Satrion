@@ -85,7 +85,7 @@ const Header = () => {
       <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top glass" style={{ borderBottom: '1px solid var(--border-color)' }}>
         <div className="container d-flex justify-content-between align-items-center">
           <Link className="navbar-brand text-success logo h1 align-self-center d-flex align-items-center" href="/" style={{ width: 'auto' }}>
-            <img src="/satrion.png" alt="Satrion Logo" style={{ height: '75px', width: '75%', filter: 'brightness(0)' }} />
+            <img src="/satrion.png?v=2" alt="Satrion Logo" style={{ height: '75px', width: '75%', filter: 'brightness(0)' }} />
           </Link>
 
           <button
