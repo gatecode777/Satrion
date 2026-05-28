@@ -109,15 +109,14 @@ const Login = () => {
               </div>
             </div>
 
-            {/* Remember Me & Forgot Password */}
-            <div className="d-flex justify-content-between align-items-center mb-4" style={{ fontSize: '0.85rem' }}>
+            {/* Remember Me */}
+            <div className="d-flex align-items-center mb-4" style={{ fontSize: '0.85rem' }}>
               <div className="form-check">
                 <input className="form-check-input" type="checkbox" id="rememberMe" style={{ cursor: 'pointer' }} />
                 <label className="form-check-label text-muted" htmlFor="rememberMe" style={{ cursor: 'pointer' }}>
                   Remember me
                 </label>
               </div>
-              <a href="#" className="text-decoration-none" style={{ color: '#38bdf8' }} onClick={(e) => { e.preventDefault(); toast.info("Mock reset link sent!"); }}>Forgot Password?</a>
             </div>
 
             {/* Submit Button */}
