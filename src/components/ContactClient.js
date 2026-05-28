@@ -96,11 +96,11 @@ const ContactClient = () => {
                   <p className="mb-4" style={{ opacity: 0.8, lineHeight: '1.8' }}>We'd love to hear from you. Our friendly team is always here to chat.</p>
 
                   <div className="d-flex align-items-center mb-4">
-                    <div className="me-3 d-flex align-items-center justify-content-center rounded-circle" style={{ width: '45px', height: '45px', backgroundColor: 'rgba(255,255,255,0.1)' }}>
+                    <div className="me-3 d-flex align-items-center justify-content-center rounded-circle" style={{ width: '45px', height: '45px', backgroundColor: 'rgba(255,255,255,0.1)', flexShrink: 0 }}>
                       <i className="fas fa-map-marker-alt" style={{ color: '#38bdf8' }}></i>
                     </div>
                     <div>
-                      <h6 className="mb-0 fw-bold">Office</h6>
+                      <h6 className="mb-0 fw-bold text-white">Office</h6>
                       <small style={{ opacity: 0.8, display: 'block', lineHeight: '1.4' }}>
                         CAPITAL GALLERIA, KANAKPURA INDUSTRIAL AREA, SIRSI ROAD, JAIPUR, RAJASTHAN, 302034
                       </small>
@@ -108,21 +108,21 @@ const ContactClient = () => {
                   </div>
 
                   <div className="d-flex align-items-center mb-4">
-                    <div className="me-3 d-flex align-items-center justify-content-center rounded-circle" style={{ width: '45px', height: '45px', backgroundColor: 'rgba(255,255,255,0.1)' }}>
+                    <div className="me-3 d-flex align-items-center justify-content-center rounded-circle" style={{ width: '45px', height: '45px', backgroundColor: 'rgba(255,255,255,0.1)', flexShrink: 0 }}>
                       <i className="fas fa-envelope" style={{ color: '#38bdf8' }}></i>
                     </div>
                     <div>
-                      <h6 className="mb-0 fw-bold">Email</h6>
+                      <h6 className="mb-0 fw-bold text-white">Email</h6>
                       <small style={{ opacity: 0.8 }}>info@satrion.in</small>
                     </div>
                   </div>
 
                   <div className="d-flex align-items-center mb-5">
-                    <div className="me-3 d-flex align-items-center justify-content-center rounded-circle" style={{ width: '45px', height: '45px', backgroundColor: 'rgba(255,255,255,0.1)' }}>
+                    <div className="me-3 d-flex align-items-center justify-content-center rounded-circle" style={{ width: '45px', height: '45px', backgroundColor: 'rgba(255,255,255,0.1)', flexShrink: 0 }}>
                       <i className="fas fa-phone" style={{ color: '#38bdf8' }}></i>
                     </div>
                     <div>
-                      <h6 className="mb-0 fw-bold">Phone</h6>
+                      <h6 className="mb-0 fw-bold text-white">Phone</h6>
                       <small style={{ opacity: 0.8 }}>+91 9116722622</small>
                     </div>
                   </div>

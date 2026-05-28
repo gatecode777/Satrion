@@ -436,37 +436,45 @@ const Profile = () => {
                               <span className="text-muted small">{order.date}</span>
                             </div>
                             <div className="d-flex align-items-center">
-                              <span className="fw-bold h5 mb-0 text-gradient-vibrant me-3">{order.total}</span>
-                              <span className={`badge px-3 py-2 rounded-pill ${
-                                order.status === 'Delivered' ? 'bg-success text-white' : 
-                                order.status === 'Processing' ? 'bg-primary text-white' : 'bg-warning text-dark'
-                              }`} style={{ fontSize: '0.75rem' }}>
-                                {order.status}
-                              </span>
-                            </div>
-                          </div>
-
-                          <hr className="my-3" style={{ borderColor: 'rgba(255,255,255,0.08)' }} />
-
-                          {/* Order items list */}
-                          <h6 className="small fw-bold text-muted mb-3 text-start">ITEMS ORDERED:</h6>
-                          <div className="d-flex flex-column gap-3 mb-3">
-                            {order.items?.map((item, idx) => {
-                              const getCleanImageUrl = (img) => {
-                                if (!img) return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="100%" height="100%" fill="%23f8f9fa"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="16" fill="%236c757d">No Image Available</text></svg>';
-                                if (img.startsWith('data:') || img.startsWith('http://') || img.startsWith('https://')) return img;
-                                return img.startsWith('/') ? img : `/${img}`;
-                              };
-
-                              return (
-                                <div key={idx} className="d-flex align-items-center gap-3 p-3 rounded-3" style={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                  <div style={{ width: '60px', height: '60px', backgroundColor: '#f8f9fa', borderRadius: '8px', padding: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <img src={getCleanImageUrl(item.image)} alt={item.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
-                                  </div>
-                                  <div className="flex-grow-1 text-start">
-                                    <h6 className="fw-bold mb-1 text-white">{item.name}</h6>
-                                    {item.price && <span className="text-info small fw-semibold" style={{ color: '#38bdf8' }}>{item.price}</span>}
-                                  </div>
+                              <div>
+                               <span className="fw-bold h5 mb-0 text-gradient-vibrant me-3">
+                                 {order.total.startsWith('₹') ? order.total : `₹${order.total}`}
+                               </span>
+                               <span className={`badge px-3 py-2 rounded-pill ${
+                                 order.status === 'Delivered' ? 'bg-success text-white' : 
+                                 order.status === 'Processing' ? 'bg-primary text-white' : 'bg-warning text-dark'
+                               }`} style={{ fontSize: '0.75rem' }}>
+                                 {order.status}
+                               </span>
+                             </div>
+                           </div>
+                         </div>
+ 
+                           <hr className="my-3" style={{ borderColor: 'rgba(255,255,255,0.08)' }} />
+ 
+                           {/* Order items list */}
+                           <h6 className="small fw-bold text-muted mb-3 text-start">ITEMS ORDERED:</h6>
+                           <div className="d-flex flex-column gap-3 mb-3">
+                             {order.items?.map((item, idx) => {
+                               const getCleanImageUrl = (img) => {
+                                 if (!img) return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="100%" height="100%" fill="%23f8f9fa"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="16" fill="%236c757d">No Image Available</text></svg>';
+                                 if (img.startsWith('data:') || img.startsWith('http://') || img.startsWith('https://')) return img;
+                                 return img.startsWith('/') ? img : `/${img}`;
+                               };
+ 
+                               return (
+                                 <div key={idx} className="d-flex align-items-center gap-3 p-3 rounded-3" style={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                   <div style={{ width: '60px', height: '60px', backgroundColor: '#f8f9fa', borderRadius: '8px', padding: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                     <img src={getCleanImageUrl(item.image)} alt={item.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                                   </div>
+                                   <div className="flex-grow-1 text-start">
+                                     <h6 className="fw-bold mb-1 text-white">{item.name}</h6>
+                                     {item.price && (
+                                       <span className="text-info small fw-semibold" style={{ color: '#38bdf8' }}>
+                                         {item.price.startsWith('₹') ? item.price : `₹${item.price}`}
+                                       </span>
+                                     )}
+                                   </div>
                                   <div className="text-end">
                                     <span className="badge bg-dark border border-secondary text-muted px-3 py-2" style={{ fontSize: '0.8rem' }}>
                                       Qty: {item.quantity}

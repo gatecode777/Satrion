@@ -213,7 +213,9 @@ const Cart = () => {
                       
                       {/* Price & Subtotal */}
                       <div className="col-6 col-md-3 text-end">
-                        <span className="text-muted d-block small" style={{ fontSize: '0.8rem' }}>{item.product.price} each</span>
+                        <span className="text-muted d-block small" style={{ fontSize: '0.8rem' }}>
+                          {item.product.price.toString().startsWith('₹') ? item.product.price : `₹${item.product.price}`} each
+                        </span>
                         <span className="fw-bold text-dark d-block" style={{ fontSize: '1.05rem', color: '#bc79e4' }}>{formatCurrency(itemSubtotal)}</span>
                       </div>
                       
