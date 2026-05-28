@@ -21,6 +21,15 @@ const formatPrice = (price) => {
   return '₹' + price;
 };
 
+const getNumericPrice = (p) => {
+  if (p === undefined || p === null) return 0;
+  if (typeof p === 'number') return p;
+  const cleanStr = String(p).replace(/[₹,]/g, '').trim();
+  const parsed = parseFloat(cleanStr);
+  return isNaN(parsed) ? 0 : parsed;
+};
+
+
 const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
   const searchParams = useSearchParams();
   const categoryParam = searchParams?.get('category') || null;
@@ -48,6 +57,10 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
+  
+  const [minPrice, setMinPrice] = useState(50000);
+  const [maxPrice, setMaxPrice] = useState(150000);
+
 
   useEffect(() => {
     // Reset scroll when mounting
@@ -86,20 +99,26 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
 
   const searchQuery = searchParams?.get('q') || '';
 
-  // Filter products based on selected category & search query
+  // Filter products based on selected category, search query, and price range
   const filteredProducts = dbProducts.filter(product => {
     const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
+    
+    // Safety check for numeric price
+    const priceNum = getNumericPrice(product.price);
+    const matchesPrice = priceNum >= minPrice && priceNum <= maxPrice;
+
     const matchesSearch = !searchQuery ||
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (product.description && product.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (product.category && product.category.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesCategory && matchesSearch;
+      
+    return matchesCategory && matchesPrice && matchesSearch;
   });
 
-  // Reset pagination to page 1 on search or category filter change
+  // Reset pagination to page 1 on search, category filter, price filter, or sorting changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategory, sortBy, searchQuery]);
+  }, [selectedCategory, sortBy, searchQuery, minPrice, maxPrice]);
 
   // Sort products based on selected sort option
   const getSortedProducts = () => {
@@ -109,14 +128,15 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
       case 'A to Z':
         return sorted.sort((a, b) => a.name.localeCompare(b.name));
       case 'Price: Low to High':
-        return sorted.sort((a, b) => parseFloat(a.price.replace(/[₹,]/g, '')) - parseFloat(b.price.replace(/[₹,]/g, '')));
+        return sorted.sort((a, b) => getNumericPrice(a.price) - getNumericPrice(b.price));
       case 'Price: High to Low':
-        return sorted.sort((a, b) => parseFloat(b.price.replace(/[₹,]/g, '')) - parseFloat(a.price.replace(/[₹,]/g, '')));
+        return sorted.sort((a, b) => getNumericPrice(b.price) - getNumericPrice(a.price));
       case 'Featured':
       default:
         return sorted;
     }
   };
+
 
   const sortedProducts = getSortedProducts();
 
@@ -843,8 +863,32 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
             color: #818cf8 !important;
             transform: translateX(4px);
           }
+
+          .custom-slider {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            outline: none;
+            transition: background 450ms ease-in;
+            -webkit-appearance: none;
+          }
+          .custom-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #bc79e4;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(188, 121, 228, 0.5);
+            transition: transform 0.1s ease;
+          }
+          .custom-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+          }
         `}
       </style>
+
 
       {/* Start Content */}
       <div className="container py-5">
@@ -879,7 +923,138 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                 );
               })}
             </ul>
+
+            {/* Price Filter Widget */}
+            <div className="card border-0 shadow-sm mt-5 p-4" style={{ backgroundColor: '#ffffff', borderRadius: '20px', border: '1px solid #f1f5f9' }}>
+              <h4 className="fw-bold mb-3 text-dark animate-fade-in" style={{ fontSize: '1.2rem', letterSpacing: '-0.3px' }}>
+                <i className="fas fa-sliders-h me-2" style={{ color: '#bc79e4' }}></i> Filter by Price
+              </h4>
+              
+              {/* Range Slider for Max Price */}
+              <div className="mb-4">
+                <div className="d-flex justify-content-between text-muted small fw-bold mb-2">
+                  <span>MAX PRICE</span>
+                  <span className="text-dark fw-bold" style={{ color: '#bc79e4' }}>{formatPrice(maxPrice)}</span>
+                </div>
+                <input 
+                  type="range" 
+                  className="form-range custom-slider"
+                  min="50000" 
+                  max="150000" 
+                  step="5000"
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(Number(e.target.value))}
+                />
+                <div className="d-flex justify-content-between text-muted mt-1" style={{ fontSize: '0.75rem' }}>
+                  <span>₹50,000</span>
+                  <span>₹1,50,000</span>
+                </div>
+              </div>
+
+              {/* Min and Max Inputs */}
+              <div className="row g-2 mb-4">
+                <div className="col-6">
+                  <label className="text-muted small fw-bold mb-1 d-block">MIN</label>
+                  <div className="input-group input-group-sm">
+                    <span className="input-group-text bg-light text-muted border-0" style={{ borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px' }}>₹</span>
+                    <input 
+                      type="number" 
+                      className="form-control bg-light border-0 text-dark fw-semibold" 
+                      value={minPrice}
+                      onChange={(e) => setMinPrice(Math.max(0, Number(e.target.value)))}
+                      placeholder="Min"
+                      style={{ borderTopRightRadius: '8px', borderBottomRightRadius: '8px' }}
+                    />
+                  </div>
+                </div>
+                <div className="col-6">
+                  <label className="text-muted small fw-bold mb-1 d-block">MAX</label>
+                  <div className="input-group input-group-sm">
+                    <span className="input-group-text bg-light text-muted border-0" style={{ borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px' }}>₹</span>
+                    <input 
+                      type="number" 
+                      className="form-control bg-light border-0 text-dark fw-semibold" 
+                      value={maxPrice}
+                      onChange={(e) => setMaxPrice(Math.max(0, Number(e.target.value)))}
+                      placeholder="Max"
+                      style={{ borderTopRightRadius: '8px', borderBottomRightRadius: '8px' }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Presets */}
+              <div className="mb-4">
+                <label className="text-muted small fw-bold mb-2 d-block">QUICK PRESETS</label>
+                <div className="d-flex flex-wrap gap-2">
+                  {[
+                    { label: 'All Prices', min: 50000, max: 150000 },
+                    { label: 'Under ₹75k', min: 50000, max: 75000 },
+                    { label: '₹75k - ₹100k', min: 75000, max: 100000 },
+                    { label: '₹100k - ₹125k', min: 100000, max: 125000 },
+                    { label: 'Over ₹125k', min: 125000, max: 150000 }
+                  ].map((preset, idx) => {
+                    const isActive = minPrice === preset.min && maxPrice === preset.max;
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => {
+                          setMinPrice(preset.min);
+                          setMaxPrice(preset.max);
+                        }}
+                        className="btn btn-sm text-capitalize border"
+                        style={{
+                          borderRadius: '8px',
+                          fontSize: '0.78rem',
+                          fontWeight: '600',
+                          padding: '6px 12px',
+                          backgroundColor: isActive ? '#bc79e4' : 'transparent',
+                          color: isActive ? '#ffffff' : '#64748b',
+                          borderColor: isActive ? '#bc79e4' : '#e2e8f0',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        {preset.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Reset Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setMinPrice(50000);
+                  setMaxPrice(150000);
+                  setSelectedCategory('All');
+                }}
+                className="btn w-100 d-flex align-items-center justify-content-center gap-2"
+                style={{
+                  borderRadius: '10px',
+                  fontSize: '0.85rem',
+                  fontWeight: '700',
+                  padding: '10px',
+                  border: '1px solid #e2e8f0',
+                  color: '#64748b',
+                  backgroundColor: '#f8fafc',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f1f5f9';
+                  e.currentTarget.style.color = '#0f172a';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f8fafc';
+                  e.currentTarget.style.color = '#64748b';
+                }}
+              >
+                <i className="fas fa-undo"></i> Reset Filters
+              </button>
+            </div>
           </div>
+
 
           {/* Products Grid */}
           <div className="col-lg-9">
