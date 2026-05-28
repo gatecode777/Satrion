@@ -182,12 +182,12 @@ export default function ReturnPolicy() {
                 <div className="col-md-4">
                   <div className="p-3 rounded text-center" style={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
                     <span className="text-muted d-block small mb-1">WEBSITE</span>
-                    <Link href="/" className="fw-bold text-info text-decoration-none small">satrion.in</Link>
+                    <Link href="/" className="fw-bold text-info text-decoration-none small">satrion.co.in</Link>
                   </div>
                 </div>
               </div>
             </div>
-            
+
           </div>
         </div>
       </div>

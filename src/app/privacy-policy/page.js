@@ -50,7 +50,7 @@ export default function PrivacyPolicy() {
                 <h4 className="fw-bold mb-0 text-white">1. Information We Collect</h4>
               </div>
               <p className="text-muted small mb-3">We may collect the following types of information:</p>
-              
+
               <div className="row g-3">
                 <div className="col-md-6">
                   <div className="p-3 rounded-3 h-100" style={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
@@ -89,7 +89,7 @@ export default function PrivacyPolicy() {
                 <h4 className="fw-bold mb-0 text-white">2. How We Use Your Information</h4>
               </div>
               <p className="text-muted small mb-3">We use the collected information for the following operational workflows:</p>
-              
+
               <div className="row g-2">
                 {[
                   "Processing and delivering e-commerce orders",
@@ -208,12 +208,12 @@ export default function PrivacyPolicy() {
                 <div className="col-md-4">
                   <div className="p-3 rounded text-center" style={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
                     <span className="text-muted d-block small mb-1">WEBSITE</span>
-                    <Link href="/" className="fw-bold text-info text-decoration-none small">satrion.in</Link>
+                    <Link href="/" className="fw-bold text-info text-decoration-none small">satrion.co.in</Link>
                   </div>
                 </div>
               </div>
             </div>
-            
+
           </div>
         </div>
       </div>

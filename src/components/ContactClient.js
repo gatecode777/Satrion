@@ -52,8 +52,8 @@ const ContactClient = () => {
 
     const L = window.L;
 
-    // Create map
-    const mymap = L.map('mapid').setView([-23.013104, -43.394365], 13);
+    // Create map pointed to R-Tech Capital Galleria, Jaipur
+    const mymap = L.map('mapid').setView([26.9226, 75.6880], 15);
     mapRef.current = mymap;
     
     // Add tile layer
@@ -63,8 +63,8 @@ const ContactClient = () => {
     }).addTo(mymap);
 
     // Add marker
-    L.marker([-23.013104, -43.394365]).addTo(mymap)
-      .bindPopup("<b>Satrion</b> eCommerce Template<br />Location.").openPopup();
+    L.marker([26.9226, 75.6880]).addTo(mymap)
+      .bindPopup("<b>Satrion Support Desk</b><br />R-Tech Capital Galleria, Jaipur").openPopup();
 
     // Disable scroll wheel and touch zoom
     mymap.scrollWheelZoom.disable();
@@ -152,7 +152,9 @@ const ContactClient = () => {
                     </div>
                     <div>
                       <h6 className="mb-0 fw-bold">Office</h6>
-                      <small style={{ opacity: 0.8 }}>Capital Galleria, Jaipur, 302034</small>
+                      <small style={{ opacity: 0.8, display: 'block', lineHeight: '1.4' }}>
+                        R-Tech Capital Galleria, Plot No. 3 (A), RIICO INDL. Area, Kanakpura, Sirsi Rd, Vaishali Nagar, Jaipur, Rajasthan 302034
+                      </small>
                     </div>
                   </div>
                   
