@@ -31,15 +31,13 @@ const Footer = () => {
                     </div>
 
                     <div className="col-md-3 pt-5">
-                        <h3 className="h4 border-bottom pb-3 mb-4 fw-bold text-white d-flex align-items-center m-0" style={{ borderColor: 'rgba(255,255,255,0.1) !important', minHeight: '60px' }}>Products</h3>
+                        <h3 className="h4 border-bottom pb-3 mb-4 fw-bold text-white d-flex align-items-center m-0" style={{ borderColor: 'rgba(255,255,255,0.1) !important', minHeight: '60px' }}>Categories</h3>
                         <ul className="list-unstyled footer-link-list" style={{ opacity: 0.8, lineHeight: '2.2', fontSize: '0.9rem' }}>
-                            <li><Link className="text-decoration-none text-light footer-hover" href="/">Mother Board</Link></li>
-                            <li><Link className="text-decoration-none text-light footer-hover" href="/shop">Processor</Link></li>
-                            <li><Link className="text-decoration-none text-light footer-hover" href="/shop">CPU</Link></li>
-                            <li><Link className="text-decoration-none text-light footer-hover" href="/shop">Monitors</Link></li>
-                            <li><Link className="text-decoration-none text-light footer-hover" href="/shop">Graphic Card</Link></li>
-                            <li><Link className="text-decoration-none text-light footer-hover" href="/shop">RAM</Link></li>
-                            <li><Link className="text-decoration-none text-light footer-hover" href="/shop">Speakers</Link></li>
+                            <li><Link className="text-decoration-none text-light footer-hover" href="/shop?category=Processors">Processors</Link></li>
+                            <li><Link className="text-decoration-none text-light footer-hover" href="/shop?category=Graphics%20Cards">Graphics Cards</Link></li>
+                            <li><Link className="text-decoration-none text-light footer-hover" href="/shop?category=Gaming%20Laptops">Gaming Laptops</Link></li>
+                            <li><Link className="text-decoration-none text-light footer-hover" href="/shop?category=Custom%20Gaming%20PCs">Custom Gaming PCs</Link></li>
+                            <li><Link className="text-decoration-none text-light footer-hover" href="/shop?category=Monitors">Monitors</Link></li>
                         </ul>
                     </div>
 
@@ -49,7 +47,7 @@ const Footer = () => {
                             <li><Link className="text-decoration-none text-light footer-hover" href="/">Home</Link></li>
                             <li><Link className="text-decoration-none text-light footer-hover" href="/about">About Us</Link></li>
                             <li><Link className="text-decoration-none text-light footer-hover" href="/shop">Shop Locations</Link></li>
-                            <li><Link className="text-decoration-none text-light footer-hover" href="/shop">FAQs</Link></li>
+                            {/* <li><Link className="text-decoration-none text-light footer-hover" href="/shop">FAQs</Link></li> */}
                             <li><Link className="text-decoration-none text-light footer-hover" href="/contact">Contact</Link></li>
                         </ul>
                     </div>
