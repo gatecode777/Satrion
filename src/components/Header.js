@@ -10,6 +10,18 @@ const Header = () => {
   const { cart, wishlist, user, isLoginModalOpen, setIsLoginModalOpen, loginUser, signupUser } = useShop();
   const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
 
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProductsDropdownOpen, setIsProductsDropdownOpen] = useState(false);
+  const [mobileSearchQuery, setMobileSearchQuery] = useState('');
+
+  const handleMobileSearchSubmit = (e) => {
+    e.preventDefault();
+    if (mobileSearchQuery.trim()) {
+      window.location.href = `/shop?q=${encodeURIComponent(mobileSearchQuery)}`;
+      setIsMobileMenuOpen(false);
+    }
+  };
+
   // Modal form states
   const [isLoginView, setIsLoginView] = useState(true);
   const [loginEmail, setLoginEmail] = useState('');
@@ -81,8 +93,21 @@ const Header = () => {
 
   return (
     <>
-      {/* Header */}
-      <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top glass" style={{ borderBottom: '1px solid var(--border-color)' }}>
+      {/* Scoped CSS for Mobile Offcanvas Transitions */}
+      <style>
+        {`
+          @keyframes slideInLeft {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+          }
+          .slide-in-left-animation {
+            animation: slideInLeft 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          }
+        `}
+      </style>
+
+      {/* Desktop Header (d-none d-lg-block) */}
+      <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top glass d-none d-lg-block" style={{ borderBottom: '1px solid var(--border-color)' }}>
         <div className="container d-flex justify-content-between align-items-center">
           <Link className="navbar-brand text-success logo h1 align-self-center d-flex align-items-center" href="/" style={{ width: 'auto' }}>
             <img src="/satrion.png?v=2" alt="Satrion Logo" style={{ height: '75px', width: '75%', filter: 'brightness(0)' }} />
@@ -190,6 +215,218 @@ const Header = () => {
           </div>
         </div>
       </nav>
+
+      {/* Mobile/Tablet Header (d-block d-lg-none) — Exact SDPT Layout */}
+      <div className="d-lg-none bg-white py-3 px-3 border-bottom sticky-top shadow-sm glass" style={{ zIndex: 1030 }}>
+        {/* Row 1: Left Hamburger, Center Logo, Right Profile & Cart */}
+        <div className="d-flex align-items-center justify-content-between">
+          {/* Left: Hamburger menu toggle */}
+          <button 
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="btn p-0 border-0 bg-transparent text-dark"
+            style={{ fontSize: '1.45rem', outline: 'none' }}
+            aria-label="Open Menu"
+          >
+            <i className="fa fa-bars"></i>
+          </button>
+
+          {/* Center: Satrion Logo */}
+          <Link href="/" className="d-flex align-items-center">
+            <img src="/satrion.png?v=2" alt="Satrion Logo" style={{ height: '42px', width: 'auto', filter: 'brightness(0)' }} />
+          </Link>
+
+          {/* Right: Profile & Cart Icon with Badge */}
+          <div className="d-flex align-items-center gap-3">
+            <Link href={user ? "/profile" : "/login"} className="text-dark" style={{ fontSize: '1.35rem' }} aria-label="Profile">
+              <i className="far fa-user"></i>
+            </Link>
+            <Link href="/cart" className="position-relative text-dark" style={{ fontSize: '1.35rem' }} aria-label="Shopping Cart">
+              <i className="fas fa-shopping-bag"></i>
+              {cartCount > 0 && (
+                <span 
+                  className="position-absolute translate-middle badge rounded-circle bg-danger d-flex align-items-center justify-content-center text-white" 
+                  style={{ 
+                    fontSize: '0.6rem', 
+                    width: '18px', 
+                    height: '18px', 
+                    top: '-3px', 
+                    right: '-9px',
+                    padding: '0',
+                    fontWeight: '700'
+                  }}
+                >
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+          </div>
+        </div>
+
+        {/* Row 2: Full Width Search Capsule below top bar */}
+        <form onSubmit={handleMobileSearchSubmit} className="mt-3">
+          <div className="position-relative w-100">
+            <i className="fa fa-search position-absolute text-muted" style={{ left: '16px', top: '50%', transform: 'translateY(-50%)', fontSize: '0.95rem' }}></i>
+            <input 
+              type="text"
+              className="form-control"
+              placeholder="Search for products..."
+              value={mobileSearchQuery}
+              onChange={(e) => setMobileSearchQuery(e.target.value)}
+              style={{
+                paddingLeft: '44px',
+                paddingRight: '16px',
+                height: '42px',
+                borderRadius: '24px',
+                backgroundColor: '#f1f5f9',
+                border: 'none',
+                fontSize: '0.9rem',
+                fontWeight: '500',
+                color: '#0f172a',
+                outline: 'none',
+                boxShadow: 'none'
+              }}
+            />
+          </div>
+        </form>
+      </div>
+
+      {/* Mobile Drawer Offcanvas Slide-in Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="position-fixed top-0 start-0 w-100 h-100" 
+          style={{ zIndex: 12000, backgroundColor: 'rgba(15, 23, 42, 0.45)', backdropFilter: 'blur(3px)', transition: 'all 0.3s' }}
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
+          <div 
+            className="bg-white h-100 d-flex flex-column slide-in-left-animation" 
+            style={{ 
+              width: '80%', 
+              maxWidth: '340px', 
+              boxShadow: '4px 0 24px rgba(0,0,0,0.15)', 
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Top row: Satrion Logo on left, Close X button on right */}
+            <div className="d-flex align-items-center justify-content-between p-3 border-bottom">
+              <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
+                <img src="/satrion.png?v=2" alt="Satrion Logo" style={{ height: '36px', width: 'auto', filter: 'brightness(0)' }} />
+              </Link>
+              <button 
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="btn border-0 p-0 bg-transparent text-dark"
+                style={{ fontSize: '1.45rem', cursor: 'pointer', outline: 'none' }}
+                aria-label="Close Menu"
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+
+            {/* Drawer Content Body */}
+            <div className="flex-grow-1 p-3 overflow-auto">
+              {/* Capsule Search Box inside Drawer */}
+              <form onSubmit={handleMobileSearchSubmit} className="mb-4">
+                <div className="position-relative w-100">
+                  <i className="fa fa-search position-absolute text-muted" style={{ left: '16px', top: '50%', transform: 'translateY(-50%)', fontSize: '0.95rem' }}></i>
+                  <input 
+                    type="text"
+                    className="form-control"
+                    placeholder="Search CPU, GPU, RAM..."
+                    value={mobileSearchQuery}
+                    onChange={(e) => setMobileSearchQuery(e.target.value)}
+                    style={{
+                      paddingLeft: '44px',
+                      paddingRight: '16px',
+                      height: '42px',
+                      borderRadius: '10px',
+                      backgroundColor: '#f1f5f9',
+                      border: 'none',
+                      fontSize: '0.9rem',
+                      fontWeight: '500',
+                      color: '#0f172a',
+                      outline: 'none',
+                      boxShadow: 'none'
+                    }}
+                  />
+                </div>
+              </form>
+
+              {/* Navigation lists */}
+              <div className="d-flex flex-column gap-3">
+                <Link 
+                  href="/" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-decoration-none text-dark fw-bold py-2 border-bottom d-block"
+                  style={{ fontSize: '1.1rem', borderColor: '#f1f5f9' }}
+                >
+                  Home
+                </Link>
+
+                {/* Products Dropdown Accordion */}
+                <div className="border-bottom pb-2" style={{ borderColor: '#f1f5f9' }}>
+                  <button 
+                    onClick={() => setIsProductsDropdownOpen(!isProductsDropdownOpen)}
+                    className="w-100 border-0 bg-transparent p-0 py-2 d-flex align-items-center justify-content-between text-dark fw-bold"
+                    style={{ fontSize: '1.1rem', outline: 'none' }}
+                  >
+                    <span>Products</span>
+                    <i className="fas fa-chevron-down text-muted" style={{ fontSize: '0.85rem', transform: isProductsDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}></i>
+                  </button>
+
+                  {/* Categories inside Products dropdown accordion */}
+                  {isProductsDropdownOpen && (
+                    <div className="ps-3 mt-2 d-flex flex-column gap-2" style={{ borderLeft: '2px solid #bc79e4' }}>
+                      <Link 
+                        href="/shop" 
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="text-decoration-none text-muted py-1"
+                        style={{ fontSize: '0.95rem', fontWeight: '600', color: '#64748b' }}
+                      >
+                        All Products
+                      </Link>
+                      {[
+                        { name: 'Processors', url: '/shop?category=Processors' },
+                        { name: 'Graphics Cards', url: '/shop?category=Graphics%20Cards' },
+                        { name: 'Gaming Laptops', url: '/shop?category=Gaming%20Laptops' },
+                        { name: 'Custom Gaming PCs', url: '/shop?category=Custom%20Gaming%20PCs' },
+                        { name: 'Monitors', url: '/shop?category=Monitors' }
+                      ].map((item, idx) => (
+                        <Link 
+                          key={idx}
+                          href={item.url} 
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="text-decoration-none text-muted py-1"
+                          style={{ fontSize: '0.95rem', fontWeight: '500' }}
+                        >
+                          {item.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <Link 
+                  href="/about" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-decoration-none text-dark fw-bold py-2 border-bottom d-block"
+                  style={{ fontSize: '1.1rem', borderColor: '#f1f5f9' }}
+                >
+                  About
+                </Link>
+
+                <Link 
+                  href="/contact" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-decoration-none text-dark fw-bold py-2 border-bottom d-block"
+                  style={{ fontSize: '1.1rem', borderColor: '#f1f5f9' }}
+                >
+                  Contact
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Close Header */}
 
       {/* Search Modal */}
