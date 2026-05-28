@@ -39,6 +39,7 @@ export default async function Home() {
       ...obj,
       id: obj._id ? obj._id.toString() : '',
       _id: obj._id ? obj._id.toString() : '',
+      image: '', // Strip massive Base64 payload on server to bypass Vercel ISR body size limits
       createdAt: obj.createdAt ? obj.createdAt.toISOString() : null,
       updatedAt: obj.updatedAt ? obj.updatedAt.toISOString() : null,
     };
