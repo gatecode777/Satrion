@@ -34,6 +34,7 @@ const getNumericPrice = (p) => {
 const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
   const searchParams = useSearchParams();
   const categoryParam = searchParams?.get('category') || null;
+  const searchQuery = searchParams?.get('q') || '';
 
   const [dbProducts, setDbProducts] = useState(initialProducts);
   const [dbCategories, setDbCategories] = useState(initialCategories);
@@ -104,7 +105,6 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
     }))
   ];
 
-  const searchQuery = searchParams?.get('q') || '';
 
   // Filter products based on selected category, search query, and price range
   const filteredProducts = dbProducts.filter(product => {
