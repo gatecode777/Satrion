@@ -24,7 +24,7 @@ const About = () => {
         <div className="container position-relative z-1">
           <div className="row align-items-center py-5">
             <div className="col-lg-6 text-white mb-5 mb-lg-0 animate-fade-in-up" style={{ zIndex: 2 }}>
-              <h1 className="display-3 fw-bold mb-4" style={{ letterSpacing: '-1px' }}>
+              <h1 className="display-3 fw-bold mb-4" style={{ letterSpacing: '-1px', color: '#ffffff' }}>
                 About <span style={{ background: 'linear-gradient(to right, #38bdf8, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Satrion</span>
               </h1>
               <p className="lead mb-4" style={{ opacity: 0.85, lineHeight: '1.8' }}>

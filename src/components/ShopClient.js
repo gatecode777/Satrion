@@ -40,7 +40,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
   const sortParam = searchParams?.get('sort') || 'Featured';
   const pageParam = parseInt(searchParams?.get('page') || '1', 10);
   const minPriceParam = parseInt(searchParams?.get('minPrice') || '50000', 10);
-  const maxPriceParam = parseInt(searchParams?.get('maxPrice') || '150000', 10);
+  const maxPriceParam = parseInt(searchParams?.get('maxPrice') || '200000', 10);
 
   const [dbProducts, setDbProducts] = useState(initialProducts);
   const [dbCategories, setDbCategories] = useState(initialCategories);
@@ -885,9 +885,9 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
             width: 18px;
             height: 18px;
             border-radius: 50%;
-            background: #bc79e4;
+            background: #000000;
             cursor: pointer;
-            box-shadow: 0 0 10px rgba(188, 121, 228, 0.5);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
             transition: transform 0.1s ease;
           }
           .custom-slider::-webkit-slider-thumb:hover {
@@ -968,20 +968,20 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
             {/* Price Filter Widget */}
             <div className="card border-0 shadow-sm mt-5 p-4" style={{ backgroundColor: '#ffffff', borderRadius: '20px', border: '1px solid #f1f5f9' }}>
               <h4 className="fw-bold mb-3 text-dark animate-fade-in" style={{ fontSize: '1.2rem', letterSpacing: '-0.3px' }}>
-                <i className="fas fa-sliders-h me-2" style={{ color: '#bc79e4' }}></i> Filter by Price
+                <i className="fas fa-sliders-h me-2" style={{ color: '#000000' }}></i> Filter by Price
               </h4>
 
               {/* Range Slider for Max Price */}
               <div className="mb-4">
                 <div className="d-flex justify-content-between text-muted small fw-bold mb-2">
                   <span>MAX PRICE</span>
-                  <span className="text-dark fw-bold" style={{ color: '#bc79e4' }}>{formatPrice(maxPrice)}</span>
+                  <span className="text-dark fw-bold" style={{ color: '#000000' }}>{formatPrice(maxPrice)}</span>
                 </div>
                 <input suppressHydrationWarning={true}
                   type="range"
                   className="form-range custom-slider"
                   min="50000"
-                  max="150000"
+                  max="200000"
                   step="5000"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(Number(e.target.value))}
@@ -990,7 +990,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
                 />
                 <div className="d-flex justify-content-between text-muted mt-1" style={{ fontSize: '0.75rem' }}>
                   <span>₹50,000</span>
-                  <span>₹1,50,000</span>
+                  <span>₹2,00,000</span>
                 </div>
               </div>
 
@@ -1043,11 +1043,11 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
                 <label className="text-muted small fw-bold mb-2 d-block">QUICK PRESETS</label>
                 <div className="d-flex flex-wrap gap-2">
                   {[
-                    { label: 'All Prices', min: 50000, max: 150000 },
+                    { label: 'All Prices', min: 50000, max: 200000 },
                     { label: 'Under ₹75k', min: 50000, max: 75000 },
                     { label: '₹75k - ₹100k', min: 75000, max: 100000 },
                     { label: '₹100k - ₹125k', min: 100000, max: 125000 },
-                    { label: 'Over ₹125k', min: 125000, max: 150000 }
+                    { label: 'Over ₹125k', min: 125000, max: 200000 }
                   ].map((preset, idx) => {
                     const isActive = minPrice === preset.min && maxPrice === preset.max;
                     return (
@@ -1065,9 +1065,9 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
                           fontSize: '0.78rem',
                           fontWeight: '600',
                           padding: '6px 12px',
-                          backgroundColor: isActive ? '#bc79e4' : 'transparent',
+                          backgroundColor: isActive ? '#000000' : 'transparent',
                           color: isActive ? '#ffffff' : '#64748b',
-                          borderColor: isActive ? '#bc79e4' : '#e2e8f0',
+                          borderColor: isActive ? '#000000' : '#e2e8f0',
                           transition: 'all 0.2s ease'
                         }}
                       >
@@ -1083,9 +1083,9 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
                 type="button"
                 onClick={() => {
                   setMinPrice(50000);
-                  setMaxPrice(150000);
+                  setMaxPrice(200000);
                   setSelectedCategory('All');
-                  updateFilters({ minPrice: 50000, maxPrice: 150000, category: 'All', page: 1 });
+                  updateFilters({ minPrice: 50000, maxPrice: 200000, category: 'All', page: 1 });
                 }}
                 className="btn w-100 d-flex align-items-center justify-content-center gap-2"
                 style={{
@@ -1633,20 +1633,20 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
               {/* Price Filter Widget */}
               <div className="card border-0 shadow-sm p-4" style={{ backgroundColor: '#ffffff', borderRadius: '20px', border: '1px solid #f1f5f9' }}>
                 <h4 className="fw-bold mb-3 text-dark" style={{ fontSize: '1.2rem', letterSpacing: '-0.3px' }}>
-                  <i className="fas fa-sliders-h me-2" style={{ color: '#bc79e4' }}></i> Filter by Price
+                  <i className="fas fa-sliders-h me-2" style={{ color: '#000000' }}></i> Filter by Price
                 </h4>
 
                 {/* Range Slider for Max Price */}
                 <div className="mb-4">
                   <div className="d-flex justify-content-between text-muted small fw-bold mb-2">
                     <span>MAX PRICE</span>
-                    <span className="text-dark fw-bold" style={{ color: '#bc79e4' }}>{formatPrice(maxPrice)}</span>
+                    <span className="text-dark fw-bold" style={{ color: '#000000' }}>{formatPrice(maxPrice)}</span>
                   </div>
                   <input suppressHydrationWarning={true}
                     type="range"
                     className="form-range custom-slider"
                     min="50000"
-                    max="150000"
+                    max="200000"
                     step="5000"
                     value={maxPrice}
                     onChange={(e) => setMaxPrice(Number(e.target.value))}
@@ -1661,7 +1661,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
                   />
                   <div className="d-flex justify-content-between text-muted mt-1" style={{ fontSize: '0.75rem' }}>
                     <span>₹50,000</span>
-                    <span>₹1,50,000</span>
+                    <span>₹2,00,000</span>
                   </div>
                 </div>
 
@@ -1714,11 +1714,11 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
                   <label className="text-muted small fw-bold mb-2 d-block">QUICK PRESETS</label>
                   <div className="d-flex flex-wrap gap-2">
                     {[
-                      { label: 'All Prices', min: 50000, max: 150000 },
+                      { label: 'All Prices', min: 50000, max: 200000 },
                       { label: 'Under ₹75k', min: 50000, max: 75000 },
                       { label: '₹75k - ₹100k', min: 75000, max: 100000 },
                       { label: '₹100k - ₹125k', min: 100000, max: 125000 },
-                      { label: 'Over ₹125k', min: 125000, max: 150000 }
+                      { label: 'Over ₹125k', min: 125000, max: 200000 }
                     ].map((preset, idx) => {
                       const isActive = minPrice === preset.min && maxPrice === preset.max;
                       return (
@@ -1737,9 +1737,9 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
                             fontSize: '0.78rem',
                             fontWeight: '600',
                             padding: '6px 12px',
-                            backgroundColor: isActive ? '#bc79e4' : 'transparent',
+                            backgroundColor: isActive ? '#000000' : 'transparent',
                             color: isActive ? '#ffffff' : '#64748b',
-                            borderColor: isActive ? '#bc79e4' : '#e2e8f0',
+                            borderColor: isActive ? '#000000' : '#e2e8f0',
                             transition: 'all 0.2s ease'
                           }}
                         >
@@ -1755,10 +1755,10 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
                   type="button"
                   onClick={() => {
                     setMinPrice(50000);
-                    setMaxPrice(150000);
+                    setMaxPrice(200000);
                     setSelectedCategory('All');
                     setIsFiltersDrawerOpen(false);
-                    updateFilters({ minPrice: 50000, maxPrice: 150000, category: 'All', page: 1 });
+                    updateFilters({ minPrice: 50000, maxPrice: 200000, category: 'All', page: 1 });
                   }}
                   className="btn w-100 d-flex align-items-center justify-content-center gap-2"
                   style={{

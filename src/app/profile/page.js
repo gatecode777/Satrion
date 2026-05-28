@@ -422,8 +422,8 @@ const Profile = () => {
                     </div>
                   ) : (
                     <div className="d-flex flex-column gap-4">
-                      {user.orders.map((order) => (
-                        <div key={order.id} className="p-4 rounded-4" style={{ 
+                      {user.orders.map((order, idx) => (
+                        <div key={order.orderId || order._id || order.id || idx} className="p-4 rounded-4" style={{ 
                           backgroundColor: 'rgba(255, 255, 255, 0.03)', 
                           border: '1px solid rgba(255,255,255,0.06)' 
                         }}>

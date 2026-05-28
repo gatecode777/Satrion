@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 const Footer = () => {
     return (
-        <footer style={{ backgroundColor: '#0f172a', borderTop: '1px solid rgba(255,255,255,0.1)' }} id="tempaltemo_footer" className="text-light pt-4 mt-5">
+        <footer style={{ backgroundColor: '#0f172a', borderTop: '1px solid rgba(255,255,255,0.1)' }} id="tempaltemo_footer" className="text-light pt-4 pb-5 mt-5">
             <div className="container">
                 <div className="row">
                     <div className="col-md-3 pt-5">
@@ -62,7 +62,7 @@ const Footer = () => {
                     </div>
                 </div>
 
-                <div className="row text-light mb-4 mt-5 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                <div className="row text-light mb-0 mt-5 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                     <div className="col-auto me-auto mb-3 mb-md-0 d-flex align-items-center">
                         <ul className="list-inline text-left footer-icons mb-0 d-flex gap-3">
                             <li className="list-inline-item m-0">

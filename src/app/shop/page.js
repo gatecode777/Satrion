@@ -44,7 +44,7 @@ export default async function ShopPage({ searchParams }) {
   const sort = resolvedParams?.sort || 'Featured';
   const page = parseInt(resolvedParams?.page || '1', 10);
   const minPrice = parseInt(resolvedParams?.minPrice || '50000', 10);
-  const maxPrice = parseInt(resolvedParams?.maxPrice || '150000', 10);
+  const maxPrice = parseInt(resolvedParams?.maxPrice || '200000', 10);
 
   const itemsPerPage = 9;
 

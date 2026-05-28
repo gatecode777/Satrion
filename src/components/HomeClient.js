@@ -100,7 +100,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
     <main className="bg-light">
       {/* Hero Section Carousel */}
       <div id="hero-carousel" className="carousel slide carousel-fade">
-        <div className="carousel-indicators">
+        <div className="carousel-indicators" style={{ zIndex: 10 }}>
           {[...Array(slidesCount)].map((_, idx) => (
             <button suppressHydrationWarning={true}
               key={idx}
@@ -109,6 +109,18 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
               className={currentSlide === idx ? 'active' : ''}
               aria-current={currentSlide === idx ? 'true' : 'false'}
               aria-label={`Slide ${idx + 1}`}
+              style={{
+                width: currentSlide === idx ? '30px' : '12px',
+                height: '6px',
+                borderRadius: '3px',
+                backgroundColor: currentSlide === idx ? '#38bdf8' : 'rgba(255, 255, 255, 0.4)',
+                border: 'none',
+                margin: '0 4px',
+                padding: 0,
+                boxShadow: 'none',
+                outline: 'none',
+                transition: 'all 0.3s ease'
+              }}
             ></button>
           ))}
         </div>
