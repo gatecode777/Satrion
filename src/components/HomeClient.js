@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useShop } from '@/context/ShopContext';
 import ProductCardImage from './ProductCardImage';
+import { ShoppingBagIcon } from './Icons';
 
 const formatPrice = (price) => {
   if (price === undefined || price === null) return '₹0';
@@ -367,7 +368,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
                           transition: 'all 0.3s ease'
                         }}
                       >
-                        <i className="fas fa-shopping-cart"></i> add to cart
+                        <ShoppingBagIcon size={16} style={{ marginRight: '8px' }} /> add to cart
                       </button>
                       <button
                         onClick={(e) => {
@@ -543,7 +544,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
                           transition: 'all 0.3s ease'
                         }}
                       >
-                        <i className="fas fa-shopping-cart"></i> add to cart
+                        <ShoppingBagIcon size={16} style={{ marginRight: '8px' }} /> add to cart
                       </button>
                       <button
                         onClick={(e) => {
@@ -719,7 +720,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
                           transition: 'all 0.3s ease'
                         }}
                       >
-                        <i className="fas fa-shopping-cart"></i> add to cart
+                        <ShoppingBagIcon size={16} style={{ marginRight: '8px' }} /> add to cart
                       </button>
                       <button
                         onClick={(e) => {
@@ -993,7 +994,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
                           e.currentTarget.style.backgroundColor = '#0d1527';
                         }}
                       >
-                        <i className="fas fa-shopping-cart"></i> Add to Cart
+                        <ShoppingBagIcon size={18} style={{ marginRight: '8px' }} /> Add to Cart
                       </button>
                       <button
                         onClick={() => toggleWishlist(selectedProduct)}

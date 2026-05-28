@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useShop } from '../context/ShopContext';
 import { toast } from 'react-toastify';
+import { UserIcon, ShoppingBagIcon } from './Icons';
 
 const Header = () => {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -181,12 +182,12 @@ const Header = () => {
                 )}
               </Link>
               <Link 
-                className="nav-icon position-relative text-decoration-none" 
+                className="nav-icon position-relative text-decoration-none d-flex align-items-center" 
                 href="/cart"
                 aria-label="Shopping Cart"
                 title="Shopping Cart"
               >
-                <i className="fa fa-fw fa-cart-arrow-down text-dark"></i>
+                <ShoppingBagIcon className="text-dark" size={20} />
                 {cartCount > 0 && (
                   <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger text-white" style={{ fontSize: '0.65rem', padding: '3px 6px' }}>
                     {cartCount}
@@ -204,12 +205,12 @@ const Header = () => {
                 </Link>
               )}
               <Link 
-                className="nav-icon position-relative text-decoration-none" 
+                className="nav-icon position-relative text-decoration-none d-flex align-items-center" 
                 href={user ? "/profile" : "/login"}
                 aria-label={user ? "Profile" : "Login"}
                 title={user ? "Profile" : "Login"}
               >
-                <i className="fa fa-fw fa-user text-dark"></i>
+                <UserIcon className="text-dark" size={20} />
               </Link>
             </div>
           </div>
@@ -237,11 +238,11 @@ const Header = () => {
 
           {/* Right: Profile & Cart Icon with Badge */}
           <div className="d-flex align-items-center gap-3">
-            <Link href={user ? "/profile" : "/login"} className="text-dark" style={{ fontSize: '1.35rem' }} aria-label="Profile">
-              <i className="far fa-user"></i>
+            <Link href={user ? "/profile" : "/login"} className="text-dark d-flex align-items-center" aria-label="Profile">
+              <UserIcon size={22} className="text-dark" />
             </Link>
-            <Link href="/cart" className="position-relative text-dark" style={{ fontSize: '1.35rem' }} aria-label="Shopping Cart">
-              <i className="fas fa-shopping-bag"></i>
+            <Link href="/cart" className="position-relative text-dark d-flex align-items-center" aria-label="Shopping Cart">
+              <ShoppingBagIcon size={22} className="text-dark" />
               {cartCount > 0 && (
                 <span 
                   className="position-absolute translate-middle badge rounded-circle bg-danger d-flex align-items-center justify-content-center text-white" 
@@ -636,7 +637,7 @@ const Header = () => {
                 <div className="mb-3">
                   <label className="form-label small fw-bold text-light" style={{ opacity: 0.8 }}>Username</label>
                   <div className="input-group">
-                    <span className="input-group-text bg-dark border-0 text-muted"><i className="fas fa-user"></i></span>
+                    <span className="input-group-text bg-dark border-0 text-muted d-flex align-items-center"><UserIcon size={16} /></span>
                     <input 
                       type="text" 
                       value={signupUsername} 

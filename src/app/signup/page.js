@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useShop } from '../../context/ShopContext';
 import { toast } from 'react-toastify';
+import { UserIcon } from '@/components/Icons';
 
 const Signup = () => {
   const [username, setUsername] = useState('');
@@ -97,7 +98,7 @@ const Signup = () => {
             <div className="mb-3">
               <label className="form-label small fw-bold text-light" style={{ opacity: 0.8 }}>Username</label>
               <div className="input-group">
-                <span className="input-group-text bg-dark border-0 text-muted"><i className="fas fa-user"></i></span>
+                <span className="input-group-text bg-dark border-0 text-muted d-flex align-items-center"><UserIcon size={16} /></span>
                 <input 
                   type="text" 
                   value={username} 

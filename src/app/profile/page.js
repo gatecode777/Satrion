@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useShop } from '../../context/ShopContext';
 import { toast } from 'react-toastify';
+import { UserIcon } from '@/components/Icons';
 
 const Profile = () => {
   const { user, updateProfile, addAddress, updateAddress, deleteAddress, logoutUser, loading, requestReturn, requestExchange, changePassword, deleteAccount } = useShop();
@@ -348,7 +349,7 @@ const Profile = () => {
                       <div className="col-md-4">
                         <label className="form-label small fw-bold text-muted">Username</label>
                         <div className="input-group">
-                          <span className="input-group-text bg-dark border-0 text-muted"><i className="fas fa-user"></i></span>
+                          <span className="input-group-text bg-dark border-0 text-muted d-flex align-items-center"><UserIcon size={16} /></span>
                           <input 
                             type="text" 
                             value={usernameInput} 

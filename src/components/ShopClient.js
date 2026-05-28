@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { useShop } from '@/context/ShopContext';
 import { toast } from 'react-toastify';
 import ProductCardImage from './ProductCardImage';
+import { UserIcon, ShoppingBagIcon } from './Icons';
 
 const formatPrice = (price) => {
   if (price === undefined || price === null) return '₹0';
@@ -394,7 +395,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                 {/* Name Field */}
                 <div style={{ marginBottom: '20px' }}>
                   <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#333' }}>
-                    <i className="fas fa-user" style={{ marginRight: '8px', color: '#bc79e4' }}></i>
+                    <UserIcon size={16} style={{ marginRight: '8px', color: '#bc79e4' }} />
                     Full Name *
                   </label>
                   <input
@@ -775,7 +776,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                           e.currentTarget.style.backgroundColor = '#0d1527';
                         }}
                       >
-                        <i className="fas fa-shopping-cart"></i> Add to Cart
+                        <ShoppingBagIcon size={18} style={{ marginRight: '8px' }} /> Add to Cart
                       </button>
                       <button
                         onClick={() => toggleWishlist(selectedProduct)}
@@ -1233,7 +1234,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                               transition: 'all 0.3s ease'
                             }}
                           >
-                            <i className="fas fa-shopping-cart"></i> add to cart
+                            <ShoppingBagIcon size={16} style={{ marginRight: '8px' }} /> add to cart
                           </button>
                           <button
                             onClick={(e) => {
