@@ -2,7 +2,14 @@ import mongoose from 'mongoose';
 // Custom DNS configuration removed to prevent SRV lookup failures on restricted networks
 
 import dns from 'node:dns/promises';
-dns.setServers(['1.1.1.1']);
+
+if (!process.env.VERCEL) {
+  try {
+    dns.setServers(['1.1.1.1']);
+  } catch (err) {
+    console.warn('Failed to set custom DNS servers:', err);
+  }
+}
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
