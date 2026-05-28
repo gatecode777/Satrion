@@ -61,6 +61,12 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
   
   const [minPrice, setMinPrice] = useState(50000);
   const [maxPrice, setMaxPrice] = useState(150000);
+  const [isFiltersDrawerOpen, setIsFiltersDrawerOpen] = useState(false);
+  const [localSearch, setLocalSearch] = useState(searchQuery);
+
+  useEffect(() => {
+    setLocalSearch(searchQuery);
+  }, [searchQuery]);
 
 
   useEffect(() => {
@@ -887,6 +893,13 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
           .custom-slider::-webkit-slider-thumb:hover {
             transform: scale(1.2);
           }
+          @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+          }
+          .slide-in-right-animation {
+            animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          }
         `}
       </style>
 
@@ -895,7 +908,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
       <div className="container py-5">
         <div className="row">
           {/* Sidebar Categories */}
-          <div className="col-lg-3">
+          <div className="col-lg-3 d-none d-lg-block">
             <h3 className="fw-bold mb-4 text-dark" style={{ letterSpacing: '-0.5px' }}>Categories</h3>
             <ul className="list-unstyled">
               <li className="pb-3 border-bottom mb-3" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
@@ -1059,6 +1072,54 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
 
           {/* Products Grid */}
           <div className="col-lg-9">
+            {/* Mobile/Tablet Toolbar: Filters Button + Search Capsule */}
+            <div className="d-flex d-lg-none gap-3 mb-4 w-100 align-items-center">
+              {/* Filters Capsule Button */}
+              <button 
+                onClick={() => setIsFiltersDrawerOpen(true)}
+                className="btn bg-white border d-flex align-items-center justify-content-center gap-2 text-dark fw-bold px-4"
+                style={{
+                  height: '46px',
+                  borderRadius: '24px',
+                  fontSize: '0.95rem',
+                  borderColor: '#e2e8f0',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                  flexShrink: 0,
+                  minWidth: '120px'
+                }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                </svg>
+                Filters
+              </button>
+
+              {/* Search Capsule Input Form */}
+              <form action="/shop" method="get" className="position-relative flex-grow-1 mb-0">
+                <i className="fa fa-search position-absolute text-muted" style={{ left: '16px', top: '50%', transform: 'translateY(-50%)', fontSize: '0.9rem' }}></i>
+                <input 
+                  type="text"
+                  name="q"
+                  className="form-control"
+                  placeholder="Search products..."
+                  value={localSearch}
+                  onChange={(e) => setLocalSearch(e.target.value)}
+                  style={{
+                    paddingLeft: '44px',
+                    paddingRight: '16px',
+                    height: '46px',
+                    borderRadius: '24px',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e2e8f0',
+                    fontSize: '0.9rem',
+                    fontWeight: '500',
+                    color: '#0f172a',
+                    outline: 'none',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                  }}
+                />
+              </form>
+            </div>
             {searchQuery && (
               <div className="alert alert-light border shadow-sm d-flex justify-content-between align-items-center mb-4 text-dark" style={{ borderRadius: '16px', padding: '16px 24px' }}>
                 <div>
@@ -1461,6 +1522,204 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
         </div>
       </section>
       {/* End Brands Section */}
+
+      {/* Mobile Filters Drawer */}
+      {isFiltersDrawerOpen && (
+        <div 
+          className="position-fixed top-0 start-0 w-100 h-100" 
+          style={{ zIndex: 12000, backgroundColor: 'rgba(15, 23, 42, 0.45)', backdropFilter: 'blur(3px)', transition: 'all 0.3s' }}
+          onClick={() => setIsFiltersDrawerOpen(false)}
+        >
+          <div 
+            className="bg-white h-100 d-flex flex-column slide-in-right-animation" 
+            style={{ 
+              width: '85%', 
+              maxWidth: '360px', 
+              boxShadow: '-4px 0 24px rgba(0,0,0,0.15)', 
+              position: 'relative',
+              marginLeft: 'auto'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="d-flex align-items-center justify-content-between p-4 border-bottom">
+              <h4 className="fw-bold mb-0 text-dark" style={{ letterSpacing: '-0.3px' }}>
+                <i className="fas fa-sliders-h me-2" style={{ color: '#bc79e4' }}></i> Filters
+              </h4>
+              <button 
+                onClick={() => setIsFiltersDrawerOpen(false)}
+                className="btn border-0 p-0 bg-transparent text-dark"
+                style={{ fontSize: '1.45rem', cursor: 'pointer', outline: 'none' }}
+                aria-label="Close Filters"
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+
+            {/* Content Body */}
+            <div className="flex-grow-1 p-4 overflow-auto">
+              {/* Category Filter */}
+              <h5 className="fw-bold mb-3 text-dark">Categories</h5>
+              <ul className="list-unstyled mb-5">
+                <li className="pb-3 border-bottom mb-3" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
+                  <button
+                    onClick={() => {
+                      setSelectedCategory('All');
+                      setIsFiltersDrawerOpen(false);
+                    }}
+                    className={`d-flex justify-content-between align-items-center w-100 text-start bg-transparent border-0 p-0 pb-1 ${selectedCategory === 'All' ? 'text-dark fw-bold' : 'text-muted'}`}
+                    style={{ fontSize: '1.05rem', cursor: 'pointer' }}
+                  >
+                    <span>All Products</span>
+                    <span className="badge rounded-pill bg-light text-dark border">{dbProducts.length}</span>
+                  </button>
+                </li>
+                {dbCategories.map((cat, idx) => {
+                  const count = dbProducts.filter(p => p.category === cat.name).length;
+                  return (
+                    <li key={cat._id || idx} className="pb-3 border-bottom mb-3" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
+                      <button
+                        onClick={() => {
+                          setSelectedCategory(cat.name);
+                          setIsFiltersDrawerOpen(false);
+                        }}
+                        className={`d-flex justify-content-between align-items-center w-100 text-start bg-transparent border-0 p-0 pb-1 ${selectedCategory === cat.name ? 'text-dark fw-bold' : 'text-muted'}`}
+                        style={{ fontSize: '1.05rem', cursor: 'pointer' }}
+                      >
+                        <span>{cat.name}</span>
+                        <span className="badge rounded-pill bg-light text-dark border">{count}</span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+
+              {/* Price Filter Widget */}
+              <div className="card border-0 shadow-sm p-4" style={{ backgroundColor: '#ffffff', borderRadius: '20px', border: '1px solid #f1f5f9' }}>
+                <h4 className="fw-bold mb-3 text-dark" style={{ fontSize: '1.2rem', letterSpacing: '-0.3px' }}>
+                  <i className="fas fa-sliders-h me-2" style={{ color: '#bc79e4' }}></i> Filter by Price
+                </h4>
+                
+                {/* Range Slider for Max Price */}
+                <div className="mb-4">
+                  <div className="d-flex justify-content-between text-muted small fw-bold mb-2">
+                    <span>MAX PRICE</span>
+                    <span className="text-dark fw-bold" style={{ color: '#bc79e4' }}>{formatPrice(maxPrice)}</span>
+                  </div>
+                  <input 
+                    type="range" 
+                    className="form-range custom-slider"
+                    min="50000" 
+                    max="150000" 
+                    step="5000"
+                    value={maxPrice}
+                    onChange={(e) => setMaxPrice(Number(e.target.value))}
+                  />
+                  <div className="d-flex justify-content-between text-muted mt-1" style={{ fontSize: '0.75rem' }}>
+                    <span>₹50,000</span>
+                    <span>₹1,50,000</span>
+                  </div>
+                </div>
+
+                {/* Min and Max Inputs */}
+                <div className="row g-2 mb-4">
+                  <div className="col-6">
+                    <label className="text-muted small fw-bold mb-1 d-block">MIN</label>
+                    <div className="input-group input-group-sm">
+                      <span className="input-group-text bg-light text-muted border-0" style={{ borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px' }}>₹</span>
+                      <input 
+                        type="number" 
+                        className="form-control bg-light border-0 text-dark fw-semibold" 
+                        value={minPrice}
+                        onChange={(e) => setMinPrice(Math.max(0, Number(e.target.value)))}
+                        placeholder="Min"
+                        style={{ borderTopRightRadius: '8px', borderBottomRightRadius: '8px' }}
+                      />
+                    </div>
+                  </div>
+                  <div className="col-6">
+                    <label className="text-muted small fw-bold mb-1 d-block">MAX</label>
+                    <div className="input-group input-group-sm">
+                      <span className="input-group-text bg-light text-muted border-0" style={{ borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px' }}>₹</span>
+                      <input 
+                        type="number" 
+                        className="form-control bg-light border-0 text-dark fw-semibold" 
+                        value={maxPrice}
+                        onChange={(e) => setMaxPrice(Math.max(0, Number(e.target.value)))}
+                        placeholder="Max"
+                        style={{ borderTopRightRadius: '8px', borderBottomRightRadius: '8px' }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Presets */}
+                <div className="mb-4">
+                  <label className="text-muted small fw-bold mb-2 d-block">QUICK PRESETS</label>
+                  <div className="d-flex flex-wrap gap-2">
+                    {[
+                      { label: 'All Prices', min: 50000, max: 150000 },
+                      { label: 'Under ₹75k', min: 50000, max: 75000 },
+                      { label: '₹75k - ₹100k', min: 75000, max: 100000 },
+                      { label: '₹100k - ₹125k', min: 100000, max: 125000 },
+                      { label: 'Over ₹125k', min: 125000, max: 150000 }
+                    ].map((preset, idx) => {
+                      const isActive = minPrice === preset.min && maxPrice === preset.max;
+                      return (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => {
+                            setMinPrice(preset.min);
+                            setMaxPrice(preset.max);
+                          }}
+                          className="btn btn-sm text-capitalize border"
+                          style={{
+                            borderRadius: '8px',
+                            fontSize: '0.78rem',
+                            fontWeight: '600',
+                            padding: '6px 12px',
+                            backgroundColor: isActive ? '#bc79e4' : 'transparent',
+                            color: isActive ? '#ffffff' : '#64748b',
+                            borderColor: isActive ? '#bc79e4' : '#e2e8f0',
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          {preset.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Reset Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMinPrice(50000);
+                    setMaxPrice(150000);
+                    setSelectedCategory('All');
+                    setIsFiltersDrawerOpen(false);
+                  }}
+                  className="btn w-100 d-flex align-items-center justify-content-center gap-2"
+                  style={{
+                    borderRadius: '10px',
+                    fontSize: '0.85rem',
+                    fontWeight: '700',
+                    padding: '10px',
+                    border: '1px solid #e2e8f0',
+                    color: '#64748b',
+                    backgroundColor: '#f8fafc',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <i className="fas fa-undo"></i> Reset Filters
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 };
