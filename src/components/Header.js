@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useShop } from '../context/ShopContext';
 import { toast } from 'react-toastify';
-import { UserIcon, ShoppingBagIcon } from './Icons';
+import { UserIcon, ShoppingBagIcon, HeartIcon } from './Icons';
 
 const Header = () => {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -169,12 +169,12 @@ const Header = () => {
                 <i className="fa fa-fw fa-search text-dark"></i>
               </button>
               <Link 
-                className="nav-icon position-relative text-decoration-none" 
+                className="nav-icon position-relative text-decoration-none d-flex align-items-center" 
                 href="/wishlist"
                 aria-label="Wishlist"
                 title="Wishlist"
               >
-                <i className="fa fa-fw fa-heart text-dark"></i>
+                <HeartIcon className="text-dark" size={20} />
                 {wishlist.length > 0 && (
                   <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger text-white" style={{ fontSize: '0.65rem', padding: '3px 6px' }}>
                     {wishlist.length}
@@ -236,10 +236,29 @@ const Header = () => {
             <img src="/satrion.png?v=2" alt="Satrion Logo" style={{ height: '42px', width: 'auto', filter: 'brightness(0)' }} />
           </Link>
 
-          {/* Right: Profile & Cart Icon with Badge */}
+          {/* Right: Profile, Wishlist & Cart Icon with Badge */}
           <div className="d-flex align-items-center gap-3">
             <Link href={user ? "/profile" : "/login"} className="text-dark d-flex align-items-center" aria-label="Profile">
               <UserIcon size={22} className="text-dark" />
+            </Link>
+            <Link href="/wishlist" className="position-relative text-dark d-flex align-items-center" aria-label="Wishlist">
+              <HeartIcon size={22} className="text-dark" />
+              {wishlist.length > 0 && (
+                <span 
+                  className="position-absolute translate-middle badge rounded-circle bg-danger d-flex align-items-center justify-content-center text-white" 
+                  style={{ 
+                    fontSize: '0.6rem', 
+                    width: '18px', 
+                    height: '18px', 
+                    top: '-3px', 
+                    right: '-9px',
+                    padding: '0',
+                    fontWeight: '700'
+                  }}
+                >
+                  {wishlist.length}
+                </span>
+              )}
             </Link>
             <Link href="/cart" className="position-relative text-dark d-flex align-items-center" aria-label="Shopping Cart">
               <ShoppingBagIcon size={22} className="text-dark" />
@@ -370,7 +389,7 @@ const Header = () => {
                     className="w-100 border-0 bg-transparent p-0 py-2 d-flex align-items-center justify-content-between text-dark fw-bold"
                     style={{ fontSize: '1.1rem', outline: 'none' }}
                   >
-                    <span>Products</span>
+                    <span>Shop</span>
                     <i className="fas fa-chevron-down text-muted" style={{ fontSize: '0.85rem', transform: isProductsDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}></i>
                   </button>
 
