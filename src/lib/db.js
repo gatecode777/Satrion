@@ -45,29 +45,8 @@ async function connectDB() {
 export async function ensureSeeded() {
   try {
     await connectDB();
-    
-    // Dynamic import to prevent any circular dependency or order of execution issues
-    const Product = (await import('@/models/Product')).default;
-    const Category = (await import('@/models/Category')).default;
-    
-    const productCount = await Product.countDocuments();
-    const categoryCount = await Category.countDocuments();
-    
-    // Only seed if the collections are completely empty to prevent overwriting user modifications
-    if (productCount === 0 && categoryCount === 0) {
-      console.log(`[Database Seeding] Database is empty. Seeding with default categories and products...`);
-      
-      const { sampleCategories, generateAllProducts } = await import('./sampleData');
-      const allProducts = generateAllProducts();
-      
-      // Seed fresh records
-      await Category.insertMany(sampleCategories);
-      await Product.insertMany(allProducts);
-      
-      console.log('[Database Seeding] Database successfully seeded with 10 categories and 100 products!');
-    }
   } catch (error) {
-    console.error('[Database Seeding] Warning: Failed to ensure database seeding:', error);
+    console.error('[Database Connection] Warning: Failed to connect to database:', error);
   }
 }
 
