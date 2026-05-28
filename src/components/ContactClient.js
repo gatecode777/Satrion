@@ -13,63 +13,12 @@ const ContactClient = () => {
     }
   }, []);
 
-  const mapRef = useRef(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     subject: '',
     message: ''
   });
-
-  // Initialize map when component mounts
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    // Load Leaflet CSS and JS dynamically
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = 'https://unpkg.com/leaflet@1.7.1/dist/leaflet.css';
-    link.integrity = 'sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==';
-    link.crossOrigin = '';
-    document.head.appendChild(link);
-
-    const script = document.createElement('script');
-    script.src = 'https://unpkg.com/leaflet@1.7.1/dist/leaflet.js';
-    script.integrity = 'sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==';
-    script.crossOrigin = '';
-    script.onload = initializeMap;
-    document.head.appendChild(script);
-
-    return () => {
-      // Cleanup
-      if (document.head.contains(link)) document.head.removeChild(link);
-      if (document.head.contains(script)) document.head.removeChild(script);
-    };
-  }, []);
-
-  const initializeMap = () => {
-    if (!window.L || mapRef.current) return;
-
-    const L = window.L;
-
-    // Create map pointed to R-Tech Capital Galleria, Jaipur
-    const mymap = L.map('mapid').setView([26.9226, 75.6880], 15);
-    mapRef.current = mymap;
-    
-    // Add tile layer
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '© OpenStreetMap'
-    }).addTo(mymap);
-
-    // Add marker
-    L.marker([26.9226, 75.6880]).addTo(mymap)
-      .bindPopup("<b>Satrion Support Desk</b><br />R-Tech Capital Galleria, Jaipur").openPopup();
-
-    // Disable scroll wheel and touch zoom
-    mymap.scrollWheelZoom.disable();
-    mymap.touchZoom.disable();
-  };
 
   const handleChange = (e) => {
     setFormData({
@@ -104,10 +53,10 @@ const ContactClient = () => {
         },
         body: JSON.stringify(formData)
       });
-      
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to send message');
-      
+
       alert('Message sent successfully!');
       setFormData({
         name: '',
@@ -140,12 +89,12 @@ const ContactClient = () => {
           <div className="col-12">
             <div className="card border-0 shadow-lg" style={{ borderRadius: '24px', overflow: 'hidden' }}>
               <div className="row g-0">
-                
+
                 {/* Left Side: Contact Info & Map */}
                 <div className="col-lg-4 text-white" style={{ background: '#0f172a', padding: '40px' }}>
                   <h3 className="fw-bold mb-4" style={{ color: '#38bdf8' }}>Get in Touch</h3>
                   <p className="mb-4" style={{ opacity: 0.8, lineHeight: '1.8' }}>We'd love to hear from you. Our friendly team is always here to chat.</p>
-                  
+
                   <div className="d-flex align-items-center mb-4">
                     <div className="me-3 d-flex align-items-center justify-content-center rounded-circle" style={{ width: '45px', height: '45px', backgroundColor: 'rgba(255,255,255,0.1)' }}>
                       <i className="fas fa-map-marker-alt" style={{ color: '#38bdf8' }}></i>
@@ -153,11 +102,11 @@ const ContactClient = () => {
                     <div>
                       <h6 className="mb-0 fw-bold">Office</h6>
                       <small style={{ opacity: 0.8, display: 'block', lineHeight: '1.4' }}>
-                        R-Tech Capital Galleria, Plot No. 3 (A), RIICO INDL. Area, Kanakpura, Sirsi Rd, Vaishali Nagar, Jaipur, Rajasthan 302034
+                        CAPITAL GALLERIA, KANAKPURA INDUSTRIAL AREA, SIRSI ROAD, JAIPUR, RAJASTHAN, 302034
                       </small>
                     </div>
                   </div>
-                  
+
                   <div className="d-flex align-items-center mb-4">
                     <div className="me-3 d-flex align-items-center justify-content-center rounded-circle" style={{ width: '45px', height: '45px', backgroundColor: 'rgba(255,255,255,0.1)' }}>
                       <i className="fas fa-envelope" style={{ color: '#38bdf8' }}></i>
@@ -167,7 +116,7 @@ const ContactClient = () => {
                       <small style={{ opacity: 0.8 }}>info@satrion.in</small>
                     </div>
                   </div>
-                  
+
                   <div className="d-flex align-items-center mb-5">
                     <div className="me-3 d-flex align-items-center justify-content-center rounded-circle" style={{ width: '45px', height: '45px', backgroundColor: 'rgba(255,255,255,0.1)' }}>
                       <i className="fas fa-phone" style={{ color: '#38bdf8' }}></i>
@@ -179,7 +128,17 @@ const ContactClient = () => {
                   </div>
 
                   {/* Map */}
-                  <div id="mapid" style={{ width: '100%', height: '220px', borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}></div>
+                  <div style={{ width: '100%', height: '240px', borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.15)', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
+                    <iframe
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      loading="lazy"
+                      allowFullScreen
+                      referrerPolicy="no-referrer-when-downgrade"
+                      src="https://maps.google.com/maps?q=R-Tech%20Capital%20Galleria%20Plot%20No.%203%20(A)%20RIICO%20INDL.%20Area%20Kanakpura%20Sirsi%20Rd%20Vaishali%20Nagar%20Jaipur%20Rajasthan%20302034&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                    ></iframe>
+                  </div>
                 </div>
 
                 {/* Right Side: Form */}
