@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useShop } from '@/context/ShopContext';
 import { toast } from 'react-toastify';
 import ProductCardImage from './ProductCardImage';
@@ -31,15 +31,22 @@ const getNumericPrice = (p) => {
 };
 
 
-const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
+const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems = 0, totalProductsCount = 0 }) => {
   const searchParams = useSearchParams();
-  const categoryParam = searchParams?.get('category') || null;
+  const router = useRouter();
+
+  const categoryParam = searchParams?.get('category') || 'All';
   const searchQuery = searchParams?.get('q') || '';
+  const sortParam = searchParams?.get('sort') || 'Featured';
+  const pageParam = parseInt(searchParams?.get('page') || '1', 10);
+  const minPriceParam = parseInt(searchParams?.get('minPrice') || '50000', 10);
+  const maxPriceParam = parseInt(searchParams?.get('maxPrice') || '150000', 10);
 
   const [dbProducts, setDbProducts] = useState(initialProducts);
   const [dbCategories, setDbCategories] = useState(initialCategories);
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [sortBy, setSortBy] = useState('Featured');
+  
+  const [selectedCategory, setSelectedCategory] = useState(categoryParam);
+  const [sortBy, setSortBy] = useState(sortParam);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const { addToCart, toggleWishlist, wishlist } = useShop();
@@ -57,18 +64,31 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
     productname: ''
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 9;
   
-  const [minPrice, setMinPrice] = useState(50000);
-  const [maxPrice, setMaxPrice] = useState(150000);
+  const [currentPage, setCurrentPage] = useState(pageParam);
+  const itemsPerPage = 9;
+
+  const [minPrice, setMinPrice] = useState(minPriceParam);
+  const [maxPrice, setMaxPrice] = useState(maxPriceParam);
   const [isFiltersDrawerOpen, setIsFiltersDrawerOpen] = useState(false);
   const [localSearch, setLocalSearch] = useState(searchQuery);
 
   useEffect(() => {
-    setLocalSearch(searchQuery);
-  }, [searchQuery]);
+    setDbProducts(initialProducts);
+  }, [initialProducts]);
 
+  useEffect(() => {
+    setDbCategories(initialCategories);
+  }, [initialCategories]);
+
+  useEffect(() => {
+    setSelectedCategory(categoryParam);
+    setSortBy(sortParam);
+    setCurrentPage(pageParam);
+    setMinPrice(minPriceParam);
+    setMaxPrice(maxPriceParam);
+    setLocalSearch(searchQuery);
+  }, [categoryParam, sortParam, pageParam, minPriceParam, maxPriceParam, searchQuery]);
 
   useEffect(() => {
     // Reset scroll when mounting
@@ -81,110 +101,59 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
     }
   }, []);
 
-  // Update URL categories sync
-  useEffect(() => {
-    if (categoryParam && dbCategories.length > 0) {
-      const decodedParam = decodeURIComponent(categoryParam).toLowerCase();
-      const matched = dbCategories.find(c => c.slug === decodedParam || c.name.toLowerCase() === decodedParam);
-      if (matched) {
-        setSelectedCategory(matched.name);
-      } else if (decodedParam === 'all') {
-        setSelectedCategory('All');
+  const updateFilters = (newParams) => {
+    const params = new URLSearchParams(window.location.search);
+    Object.entries(newParams).forEach(([key, value]) => {
+      if (value === null || value === undefined || value === 'All' || (key === 'q' && !value)) {
+        params.delete(key);
       } else {
-        setSelectedCategory(categoryParam);
+        params.set(key, value);
       }
-    }
-  }, [categoryParam, dbCategories]);
+    });
+    router.push(`/shop?${params.toString()}`, { scroll: false });
+  };
+
+  const handleCategorySelect = (categoryName) => {
+    setSelectedCategory(categoryName);
+    updateFilters({ category: categoryName, page: 1 });
+  };
 
   // Dynamically compute active categories for the top bar and sidebar
   const categories = [
-    { name: 'All', count: dbProducts.length },
+    { name: 'All', count: totalProductsCount },
     ...dbCategories.map(cat => ({
       name: cat.name,
-      count: dbProducts.filter(p => p.category === cat.name).length
+      count: cat.count || 0
     }))
   ];
 
-
-  // Filter products based on selected category, search query, and price range
-  const filteredProducts = dbProducts.filter(product => {
-    const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
-    
-    // Safety check for numeric price
-    const priceNum = getNumericPrice(product.price);
-    const matchesPrice = priceNum >= minPrice && priceNum <= maxPrice;
-
-    const matchesSearch = !searchQuery ||
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (product.description && product.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (product.category && product.category.toLowerCase().includes(searchQuery.toLowerCase()));
-      
-    return matchesCategory && matchesPrice && matchesSearch;
-  });
-
-  // Reset pagination to page 1 on search, category filter, price filter, or sorting changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCategory, sortBy, searchQuery, minPrice, maxPrice]);
-
-  // Sort products based on selected sort option
-  const getSortedProducts = () => {
-    let sorted = [...filteredProducts];
-
-    switch (sortBy) {
-      case 'A to Z':
-        return sorted.sort((a, b) => a.name.localeCompare(b.name));
-      case 'Price: Low to High':
-        return sorted.sort((a, b) => getNumericPrice(a.price) - getNumericPrice(b.price));
-      case 'Price: High to Low':
-        return sorted.sort((a, b) => getNumericPrice(b.price) - getNumericPrice(a.price));
-      case 'Featured':
-      default:
-        return sorted;
-    }
-  };
-
-
-  const sortedProducts = getSortedProducts();
-
-  // Pagination Calculations
-  const totalPages = Math.max(1, Math.ceil(sortedProducts.length / itemsPerPage));
-  const indexOfLastProduct = currentPage * itemsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
-  const paginatedProducts = sortedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+  const paginatedProducts = dbProducts;
+  const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
 
   const getPageNumbers = () => {
     const pages = [];
-    const maxVisible = 5;
-    if (totalPages <= maxVisible) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      pages.push(1);
-      let start = Math.max(2, currentPage - 1);
-      let end = Math.min(totalPages - 1, currentPage + 1);
-      if (currentPage <= 3) {
-        end = 4;
-      } else if (currentPage >= totalPages - 2) {
-        start = totalPages - 3;
-      }
-      if (start > 2) {
-        pages.push('ellipsis-start');
-      }
-      for (let i = start; i <= end; i++) {
-        pages.push(i);
-      }
-      if (end < totalPages - 1) {
-        pages.push('ellipsis-end');
-      }
-      pages.push(totalPages);
+    if (totalPages <= 3) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+      return pages;
+    }
+    let start = currentPage - 1;
+    let end = currentPage + 1;
+    if (start < 1) {
+      start = 1;
+      end = 3;
+    } else if (end > totalPages) {
+      end = totalPages;
+      start = totalPages - 2;
+    }
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
     }
     return pages;
   };
 
   const handlePageChange = (pageNum) => {
     setCurrentPage(pageNum);
+    updateFilters({ page: pageNum });
     if (typeof window !== 'undefined') {
       const gridElement = document.getElementById('shop-products-grid');
       if (gridElement) {
@@ -197,6 +166,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
 
   const handleSortChange = (e) => {
     setSortBy(e.target.value);
+    updateFilters({ sort: e.target.value, page: 1 });
   };
 
   const handleQuoteClick = (product) => {
@@ -386,7 +356,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
               color: 'white',
               textAlign: 'center'
             }}>
-              <button
+              <button suppressHydrationWarning={true}
                 onClick={() => setShowQuoteModal(false)}
                 style={{
                   position: 'absolute',
@@ -434,7 +404,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                     <UserIcon size={16} style={{ marginRight: '8px', color: '#bc79e4' }} />
                     Full Name *
                   </label>
-                  <input
+                  <input suppressHydrationWarning={true}
                     type="text"
                     name="name"
                     value={formData.name}
@@ -459,7 +429,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                     <i className="fas fa-envelope" style={{ marginRight: '8px', color: '#bc79e4' }}></i>
                     Email Address *
                   </label>
-                  <input
+                  <input suppressHydrationWarning={true}
                     type="email"
                     name="email"
                     value={formData.email}
@@ -484,7 +454,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                     <i className="fas fa-phone" style={{ marginRight: '8px', color: '#bc79e4' }}></i>
                     Phone Number *
                   </label>
-                  <input
+                  <input suppressHydrationWarning={true}
                     type="tel"
                     name="phone"
                     value={formData.phone}
@@ -510,7 +480,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                     <i className="fas fa-boxes" style={{ marginRight: '8px', color: '#bc79e4' }}></i>
                     Quantity
                   </label>
-                  <input
+                  <input suppressHydrationWarning={true}
                     type="number"
                     name="quantity"
                     value={formData.quantity}
@@ -534,7 +504,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                     <i className="fas fa-comment" style={{ marginRight: '8px', color: '#bc79e4' }}></i>
                     Additional Message
                   </label>
-                  <textarea
+                  <textarea suppressHydrationWarning={true}
                     name="message"
                     value={formData.message}
                     onChange={handleInputChange}
@@ -554,7 +524,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                 </div>
 
                 {/* Submit Button */}
-                <button
+                <button suppressHydrationWarning={true}
                   type="submit"
                   style={{
                     width: '100%',
@@ -625,7 +595,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
             padding: '40px'
           }} onClick={(e) => e.stopPropagation()}>
             {/* Close Button */}
-            <button
+            <button suppressHydrationWarning={true}
               onClick={() => setShowDetailsModal(false)}
               style={{
                 position: 'absolute',
@@ -788,7 +758,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                   {/* Action Buttons */}
                   <div style={{ paddingLeft: '15px' }}>
                     <div className="d-flex gap-3 mb-4">
-                      <button
+                      <button suppressHydrationWarning={true}
                         onClick={() => {
                           addToCart(selectedProduct);
                           setShowDetailsModal(false);
@@ -814,7 +784,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                       >
                         <ShoppingBagIcon size={18} style={{ marginRight: '8px' }} /> Add to Cart
                       </button>
-                      <button
+                      <button suppressHydrationWarning={true}
                         onClick={() => toggleWishlist(selectedProduct)}
                         className="btn d-flex align-items-center justify-content-center"
                         style={{
@@ -930,6 +900,33 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
           .slide-in-right-animation {
             animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
           }
+          .shop-pagination .page-btn {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+          }
+          .shop-pagination .ellipsis-btn {
+            width: 28px;
+            height: 42px;
+            font-size: 1rem;
+          }
+          @media (max-width: 575px) {
+            .shop-pagination { gap: 6px !important; }
+            .shop-pagination .page-btn {
+              width: 36px;
+              height: 36px;
+              min-width: 36px;
+              border-radius: 10px;
+              font-size: 0.82rem;
+            }
+            .shop-pagination .ellipsis-btn {
+              width: 22px;
+              height: 36px;
+              font-size: 0.9rem;
+            }
+          }
         `}
       </style>
 
@@ -942,21 +939,21 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
             <h3 className="fw-bold mb-4 text-dark" style={{ letterSpacing: '-0.5px' }}>Categories</h3>
             <ul className="list-unstyled">
               <li className="pb-3 border-bottom mb-3" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
-                <button
-                  onClick={() => setSelectedCategory('All')}
+                <button suppressHydrationWarning={true}
+                  onClick={() => handleCategorySelect('All')}
                   className={`d-flex justify-content-between align-items-center w-100 text-start bg-transparent border-0 p-0 pb-1 ${selectedCategory === 'All' ? 'text-dark fw-bold' : 'text-muted'}`}
                   style={{ fontSize: '1.05rem', cursor: 'pointer' }}
                 >
                   <span>All Products</span>
-                  <span className="badge rounded-pill bg-light text-dark border">{dbProducts.length}</span>
+                  <span className="badge rounded-pill bg-light text-dark border">{totalProductsCount}</span>
                 </button>
               </li>
               {dbCategories.map((cat, idx) => {
-                const count = dbProducts.filter(p => p.category === cat.name).length;
+                const count = cat.count || 0;
                 return (
                   <li key={cat._id || idx} className="pb-3 border-bottom mb-3" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
-                    <button
-                      onClick={() => setSelectedCategory(cat.name)}
+                    <button suppressHydrationWarning={true}
+                      onClick={() => handleCategorySelect(cat.name)}
                       className={`d-flex justify-content-between align-items-center w-100 text-start bg-transparent border-0 p-0 pb-1 ${selectedCategory === cat.name ? 'text-dark fw-bold' : 'text-muted'}`}
                       style={{ fontSize: '1.05rem', cursor: 'pointer' }}
                     >
@@ -973,21 +970,23 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
               <h4 className="fw-bold mb-3 text-dark animate-fade-in" style={{ fontSize: '1.2rem', letterSpacing: '-0.3px' }}>
                 <i className="fas fa-sliders-h me-2" style={{ color: '#bc79e4' }}></i> Filter by Price
               </h4>
-              
+
               {/* Range Slider for Max Price */}
               <div className="mb-4">
                 <div className="d-flex justify-content-between text-muted small fw-bold mb-2">
                   <span>MAX PRICE</span>
                   <span className="text-dark fw-bold" style={{ color: '#bc79e4' }}>{formatPrice(maxPrice)}</span>
                 </div>
-                <input 
-                  type="range" 
+                <input suppressHydrationWarning={true}
+                  type="range"
                   className="form-range custom-slider"
-                  min="50000" 
-                  max="150000" 
+                  min="50000"
+                  max="150000"
                   step="5000"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(Number(e.target.value))}
+                  onMouseUp={() => updateFilters({ minPrice, maxPrice, page: 1 })}
+                  onTouchEnd={() => updateFilters({ minPrice, maxPrice, page: 1 })}
                 />
                 <div className="d-flex justify-content-between text-muted mt-1" style={{ fontSize: '0.75rem' }}>
                   <span>₹50,000</span>
@@ -1001,11 +1000,17 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                   <label className="text-muted small fw-bold mb-1 d-block">MIN</label>
                   <div className="input-group input-group-sm">
                     <span className="input-group-text bg-light text-muted border-0" style={{ borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px' }}>₹</span>
-                    <input 
-                      type="number" 
-                      className="form-control bg-light border-0 text-dark fw-semibold" 
+                    <input suppressHydrationWarning={true}
+                      type="number"
+                      className="form-control bg-light border-0 text-dark fw-semibold"
                       value={minPrice}
                       onChange={(e) => setMinPrice(Math.max(0, Number(e.target.value)))}
+                      onBlur={() => updateFilters({ minPrice, maxPrice, page: 1 })}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          updateFilters({ minPrice, maxPrice, page: 1 });
+                        }
+                      }}
                       placeholder="Min"
                       style={{ borderTopRightRadius: '8px', borderBottomRightRadius: '8px' }}
                     />
@@ -1015,11 +1020,17 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                   <label className="text-muted small fw-bold mb-1 d-block">MAX</label>
                   <div className="input-group input-group-sm">
                     <span className="input-group-text bg-light text-muted border-0" style={{ borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px' }}>₹</span>
-                    <input 
-                      type="number" 
-                      className="form-control bg-light border-0 text-dark fw-semibold" 
+                    <input suppressHydrationWarning={true}
+                      type="number"
+                      className="form-control bg-light border-0 text-dark fw-semibold"
                       value={maxPrice}
                       onChange={(e) => setMaxPrice(Math.max(0, Number(e.target.value)))}
+                      onBlur={() => updateFilters({ minPrice, maxPrice, page: 1 })}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          updateFilters({ minPrice, maxPrice, page: 1 });
+                        }
+                      }}
                       placeholder="Max"
                       style={{ borderTopRightRadius: '8px', borderBottomRightRadius: '8px' }}
                     />
@@ -1040,12 +1051,13 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                   ].map((preset, idx) => {
                     const isActive = minPrice === preset.min && maxPrice === preset.max;
                     return (
-                      <button
+                      <button suppressHydrationWarning={true}
                         key={idx}
                         type="button"
                         onClick={() => {
                           setMinPrice(preset.min);
                           setMaxPrice(preset.max);
+                          updateFilters({ minPrice: preset.min, maxPrice: preset.max, page: 1 });
                         }}
                         className="btn btn-sm text-capitalize border"
                         style={{
@@ -1067,12 +1079,13 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
               </div>
 
               {/* Reset Button */}
-              <button
+              <button suppressHydrationWarning={true}
                 type="button"
                 onClick={() => {
                   setMinPrice(50000);
                   setMaxPrice(150000);
                   setSelectedCategory('All');
+                  updateFilters({ minPrice: 50000, maxPrice: 150000, category: 'All', page: 1 });
                 }}
                 className="btn w-100 d-flex align-items-center justify-content-center gap-2"
                 style={{
@@ -1094,7 +1107,6 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                   e.currentTarget.style.color = '#64748b';
                 }}
               >
-                <i className="fas fa-undo"></i> Reset Filters
               </button>
             </div>
           </div>
@@ -1105,7 +1117,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
             {/* Mobile/Tablet Toolbar: Filters Button + Search Capsule */}
             <div className="d-flex d-lg-none gap-3 mb-4 w-100 align-items-center">
               {/* Filters Capsule Button */}
-              <button 
+              <button suppressHydrationWarning={true}
                 onClick={() => setIsFiltersDrawerOpen(true)}
                 className="btn bg-white border d-flex align-items-center justify-content-center gap-2 text-dark fw-bold px-4"
                 style={{
@@ -1127,7 +1139,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
               {/* Search Capsule Input Form */}
               <form action="/shop" method="get" className="position-relative flex-grow-1 mb-0">
                 <i className="fa fa-search position-absolute text-muted" style={{ left: '16px', top: '50%', transform: 'translateY(-50%)', fontSize: '0.9rem' }}></i>
-                <input 
+                <input suppressHydrationWarning={true}
                   type="text"
                   name="q"
                   className="form-control"
@@ -1154,7 +1166,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
               <div className="alert alert-light border shadow-sm d-flex justify-content-between align-items-center mb-4 text-dark" style={{ borderRadius: '16px', padding: '16px 24px' }}>
                 <div>
                   <i className="fas fa-search me-2" style={{ color: '#bc79e4' }}></i>
-                  Showing results for "<strong>{searchQuery}</strong>" ({sortedProducts.length} items found)
+                  Showing results for "<strong>{searchQuery}</strong>" ({totalItems} items found)
                 </div>
                 <Link href="/shop" className="btn btn-sm btn-dark rounded-pill px-3" style={{ fontSize: '0.85rem' }}>
                   Clear Search
@@ -1166,13 +1178,13 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
               <div className="col-md-6 col-12 mb-3 mb-md-0">
                 <h4 className="fw-bold mb-0 text-dark" style={{ letterSpacing: '-0.5px' }}>
                   {selectedCategory === 'All' ? 'All Products' : selectedCategory}
-                  <span className="text-muted fs-6 fw-normal ms-2">({sortedProducts.length} items)</span>
+                  <span className="text-muted fs-6 fw-normal ms-2">({totalItems} items)</span>
                 </h4>
               </div>
               <div className="col-md-6 col-12 d-flex justify-content-md-end">
                 <div className="d-flex align-items-center gap-2 w-100 justify-content-md-end">
                   <span className="text-muted small text-nowrap d-none d-sm-inline">Sort By:</span>
-                  <select
+                  <select suppressHydrationWarning={true}
                     className="form-select text-dark border shadow-sm"
                     value={sortBy}
                     onChange={handleSortChange}
@@ -1238,7 +1250,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                           </div>
                         )}
 
-                        <button
+                        <button suppressHydrationWarning={true}
                           onClick={(e) => {
                             e.stopPropagation();
                             toggleWishlist(product);
@@ -1280,7 +1292,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                           </div>
 
                           <div className="d-flex justify-content-between align-items-start mb-2">
-                            <button
+                            <button suppressHydrationWarning={true}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setSelectedProduct(product);
@@ -1309,7 +1321,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                         </div>
 
                         <div className="d-flex gap-2 mt-auto pt-2">
-                          <button
+                          <button suppressHydrationWarning={true}
                             onClick={(e) => {
                               e.stopPropagation();
                               addToCart(product);
@@ -1327,7 +1339,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                           >
                             <ShoppingBagIcon size={16} style={{ marginRight: '8px' }} /> add to cart
                           </button>
-                          <button
+                          <button suppressHydrationWarning={true}
                             onClick={(e) => {
                               e.stopPropagation();
                               setSelectedProduct(product);
@@ -1361,59 +1373,44 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="row mt-5">
+              <div className="d-flex justify-content-center mt-5 w-100">
                 <nav aria-label="Product Page Navigation">
-                  <ul className="pagination justify-content-center align-items-center gap-2">
+                  <ul className="shop-pagination pagination mb-0 justify-content-center align-items-center flex-wrap gap-2" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                     {/* Previous Button */}
                     <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                      <button
+                      <button suppressHydrationWarning={true}
                         className="page-link shadow-sm d-flex align-items-center justify-content-center"
                         style={{
-                          borderRadius: '12px',
                           width: '42px',
                           height: '42px',
+                          borderRadius: '50%',
                           border: '1px solid #e2e8f0',
                           backgroundColor: '#ffffff',
-                          color: '#0f172a',
-                          fontWeight: '600',
-                          transition: 'all 0.2s ease',
+                          color: currentPage === 1 ? '#adb5bd' : '#0f172a',
                           cursor: currentPage === 1 ? 'not-allowed' : 'pointer'
                         }}
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 1}
                       >
-                        <i className="fas fa-chevron-left"></i>
+                        <i className="fas fa-chevron-left" style={{ fontSize: '0.8rem' }}></i>
                       </button>
                     </li>
 
                     {/* Page Numbers */}
-                    {getPageNumbers().map((pageNum, index) => {
-                      if (pageNum === 'ellipsis-start' || pageNum === 'ellipsis-end') {
-                        return (
-                          <li key={pageNum + '-' + index} className="page-item disabled">
-                            <span 
-                              className="d-flex align-items-center justify-content-center text-muted"
-                              style={{ width: '42px', height: '42px', fontSize: '1rem', fontWeight: '600' }}
-                            >
-                              ...
-                            </span>
-                          </li>
-                        );
-                      }
+                    {getPageNumbers().map((pageNum) => {
                       const isActive = currentPage === pageNum;
                       return (
                         <li key={pageNum} className={`page-item ${isActive ? 'active' : ''}`}>
-                          <button
-                            className="page-link shadow-sm d-flex align-items-center justify-content-center"
+                          <button suppressHydrationWarning={true}
+                            className={`page-link shadow-sm d-flex align-items-center justify-content-center ${isActive ? 'active' : ''}`}
                             style={{
-                              borderRadius: '12px',
                               width: '42px',
                               height: '42px',
+                              borderRadius: '50%',
                               border: '1px solid ' + (isActive ? '#0f172a' : '#e2e8f0'),
                               backgroundColor: isActive ? '#0f172a' : '#ffffff',
                               color: isActive ? '#ffffff' : '#0f172a',
-                              fontWeight: '600',
-                              transition: 'all 0.2s ease',
+                              fontWeight: '700',
                               cursor: 'pointer'
                             }}
                             onClick={() => handlePageChange(pageNum)}
@@ -1426,23 +1423,21 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
 
                     {/* Next Button */}
                     <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                      <button
+                      <button suppressHydrationWarning={true}
                         className="page-link shadow-sm d-flex align-items-center justify-content-center"
                         style={{
-                          borderRadius: '12px',
                           width: '42px',
                           height: '42px',
+                          borderRadius: '50%',
                           border: '1px solid #e2e8f0',
                           backgroundColor: '#ffffff',
-                          color: '#0f172a',
-                          fontWeight: '600',
-                          transition: 'all 0.2s ease',
+                          color: currentPage === totalPages ? '#adb5bd' : '#0f172a',
                           cursor: currentPage === totalPages ? 'not-allowed' : 'pointer'
                         }}
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
                       >
-                        <i className="fas fa-chevron-right"></i>
+                        <i className="fas fa-chevron-right" style={{ fontSize: '0.8rem' }}></i>
                       </button>
                     </li>
                   </ul>
@@ -1566,17 +1561,17 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
 
       {/* Mobile Filters Drawer */}
       {isFiltersDrawerOpen && (
-        <div 
-          className="position-fixed top-0 start-0 w-100 h-100" 
+        <div
+          className="position-fixed top-0 start-0 w-100 h-100"
           style={{ zIndex: 12000, backgroundColor: 'rgba(15, 23, 42, 0.45)', backdropFilter: 'blur(3px)', transition: 'all 0.3s' }}
           onClick={() => setIsFiltersDrawerOpen(false)}
         >
-          <div 
-            className="bg-white h-100 d-flex flex-column slide-in-right-animation" 
-            style={{ 
-              width: '85%', 
-              maxWidth: '360px', 
-              boxShadow: '-4px 0 24px rgba(0,0,0,0.15)', 
+          <div
+            className="bg-white h-100 d-flex flex-column slide-in-right-animation"
+            style={{
+              width: '85%',
+              maxWidth: '360px',
+              boxShadow: '-4px 0 24px rgba(0,0,0,0.15)',
               position: 'relative',
               marginLeft: 'auto'
             }}
@@ -1587,7 +1582,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
               <h4 className="fw-bold mb-0 text-dark" style={{ letterSpacing: '-0.3px' }}>
                 <i className="fas fa-sliders-h me-2" style={{ color: '#bc79e4' }}></i> Filters
               </h4>
-              <button 
+              <button suppressHydrationWarning={true}
                 onClick={() => setIsFiltersDrawerOpen(false)}
                 className="btn border-0 p-0 bg-transparent text-dark"
                 style={{ fontSize: '1.45rem', cursor: 'pointer', outline: 'none' }}
@@ -1603,25 +1598,25 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
               <h5 className="fw-bold mb-3 text-dark">Categories</h5>
               <ul className="list-unstyled mb-5">
                 <li className="pb-3 border-bottom mb-3" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
-                  <button
+                  <button suppressHydrationWarning={true}
                     onClick={() => {
-                      setSelectedCategory('All');
+                      handleCategorySelect('All');
                       setIsFiltersDrawerOpen(false);
                     }}
                     className={`d-flex justify-content-between align-items-center w-100 text-start bg-transparent border-0 p-0 pb-1 ${selectedCategory === 'All' ? 'text-dark fw-bold' : 'text-muted'}`}
                     style={{ fontSize: '1.05rem', cursor: 'pointer' }}
                   >
                     <span>All Products</span>
-                    <span className="badge rounded-pill bg-light text-dark border">{dbProducts.length}</span>
+                    <span className="badge rounded-pill bg-light text-dark border">{totalProductsCount}</span>
                   </button>
                 </li>
                 {dbCategories.map((cat, idx) => {
-                  const count = dbProducts.filter(p => p.category === cat.name).length;
+                  const count = cat.count || 0;
                   return (
                     <li key={cat._id || idx} className="pb-3 border-bottom mb-3" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
-                      <button
+                      <button suppressHydrationWarning={true}
                         onClick={() => {
-                          setSelectedCategory(cat.name);
+                          handleCategorySelect(cat.name);
                           setIsFiltersDrawerOpen(false);
                         }}
                         className={`d-flex justify-content-between align-items-center w-100 text-start bg-transparent border-0 p-0 pb-1 ${selectedCategory === cat.name ? 'text-dark fw-bold' : 'text-muted'}`}
@@ -1640,21 +1635,29 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                 <h4 className="fw-bold mb-3 text-dark" style={{ fontSize: '1.2rem', letterSpacing: '-0.3px' }}>
                   <i className="fas fa-sliders-h me-2" style={{ color: '#bc79e4' }}></i> Filter by Price
                 </h4>
-                
+
                 {/* Range Slider for Max Price */}
                 <div className="mb-4">
                   <div className="d-flex justify-content-between text-muted small fw-bold mb-2">
                     <span>MAX PRICE</span>
                     <span className="text-dark fw-bold" style={{ color: '#bc79e4' }}>{formatPrice(maxPrice)}</span>
                   </div>
-                  <input 
-                    type="range" 
+                  <input suppressHydrationWarning={true}
+                    type="range"
                     className="form-range custom-slider"
-                    min="50000" 
-                    max="150000" 
+                    min="50000"
+                    max="150000"
                     step="5000"
                     value={maxPrice}
                     onChange={(e) => setMaxPrice(Number(e.target.value))}
+                    onMouseUp={() => {
+                      updateFilters({ minPrice, maxPrice, page: 1 });
+                      setIsFiltersDrawerOpen(false);
+                    }}
+                    onTouchEnd={() => {
+                      updateFilters({ minPrice, maxPrice, page: 1 });
+                      setIsFiltersDrawerOpen(false);
+                    }}
                   />
                   <div className="d-flex justify-content-between text-muted mt-1" style={{ fontSize: '0.75rem' }}>
                     <span>₹50,000</span>
@@ -1668,11 +1671,17 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                     <label className="text-muted small fw-bold mb-1 d-block">MIN</label>
                     <div className="input-group input-group-sm">
                       <span className="input-group-text bg-light text-muted border-0" style={{ borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px' }}>₹</span>
-                      <input 
-                        type="number" 
-                        className="form-control bg-light border-0 text-dark fw-semibold" 
+                      <input suppressHydrationWarning={true}
+                        type="number"
+                        className="form-control bg-light border-0 text-dark fw-semibold"
                         value={minPrice}
                         onChange={(e) => setMinPrice(Math.max(0, Number(e.target.value)))}
+                        onBlur={() => updateFilters({ minPrice, maxPrice, page: 1 })}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            updateFilters({ minPrice, maxPrice, page: 1 });
+                          }
+                        }}
                         placeholder="Min"
                         style={{ borderTopRightRadius: '8px', borderBottomRightRadius: '8px' }}
                       />
@@ -1682,11 +1691,17 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                     <label className="text-muted small fw-bold mb-1 d-block">MAX</label>
                     <div className="input-group input-group-sm">
                       <span className="input-group-text bg-light text-muted border-0" style={{ borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px' }}>₹</span>
-                      <input 
-                        type="number" 
-                        className="form-control bg-light border-0 text-dark fw-semibold" 
+                      <input suppressHydrationWarning={true}
+                        type="number"
+                        className="form-control bg-light border-0 text-dark fw-semibold"
                         value={maxPrice}
                         onChange={(e) => setMaxPrice(Math.max(0, Number(e.target.value)))}
+                        onBlur={() => updateFilters({ minPrice, maxPrice, page: 1 })}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            updateFilters({ minPrice, maxPrice, page: 1 });
+                          }
+                        }}
                         placeholder="Max"
                         style={{ borderTopRightRadius: '8px', borderBottomRightRadius: '8px' }}
                       />
@@ -1707,12 +1722,14 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                     ].map((preset, idx) => {
                       const isActive = minPrice === preset.min && maxPrice === preset.max;
                       return (
-                        <button
+                        <button suppressHydrationWarning={true}
                           key={idx}
                           type="button"
                           onClick={() => {
                             setMinPrice(preset.min);
                             setMaxPrice(preset.max);
+                            updateFilters({ minPrice: preset.min, maxPrice: preset.max, page: 1 });
+                            setIsFiltersDrawerOpen(false);
                           }}
                           className="btn btn-sm text-capitalize border"
                           style={{
@@ -1734,13 +1751,14 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                 </div>
 
                 {/* Reset Button */}
-                <button
+                <button suppressHydrationWarning={true}
                   type="button"
                   onClick={() => {
                     setMinPrice(50000);
                     setMaxPrice(150000);
                     setSelectedCategory('All');
                     setIsFiltersDrawerOpen(false);
+                    updateFilters({ minPrice: 50000, maxPrice: 150000, category: 'All', page: 1 });
                   }}
                   className="btn w-100 d-flex align-items-center justify-content-center gap-2"
                   style={{

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useShop } from '@/context/ShopContext';
 import ProductCardImage from './ProductCardImage';
@@ -85,7 +86,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
       <div id="hero-carousel" className="carousel slide carousel-fade">
         <div className="carousel-indicators">
           {[...Array(slidesCount)].map((_, idx) => (
-            <button
+            <button suppressHydrationWarning={true}
               key={idx}
               type="button"
               onClick={() => setCurrentSlide(idx)}
@@ -105,11 +106,14 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
             { img: '/banner_img_05_new.png', tag: 'CONSOLES', title: 'Next-Level Play', desc: 'Minimalist controllers and gear for true gamers.' }
           ].map((banner, idx) => (
             <div className={`carousel-item h-100 ${idx === currentSlide ? 'active' : ''}`} key={idx}>
-              <img
+              <Image
                 src={banner.img}
-                className="d-block w-100 h-100"
-                style={{ objectFit: 'cover', opacity: 0.8 }}
                 alt={banner.title}
+                fill
+                sizes="100vw"
+                style={{ objectFit: 'cover', opacity: 0.8 }}
+                priority={idx === 0}
+                quality={85}
               />
               <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center">
                 <div className="container">
@@ -121,7 +125,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
                     </h1>
                     <p className="lead text-muted mb-4" style={{ opacity: 0.8 }}>{banner.desc}</p>
                     <Link href="/shop" className="btn btn-dark rounded-pill px-4 py-2 fw-bold hover-lift">
-                      Shop Now <i className="fas fa-arrow-right ms-2"></i>
+                      <i className="fas fa-arrow-right me-2"></i> Shop Now
                     </Link>
                   </div>
                 </div>
@@ -129,20 +133,20 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
             </div>
           ))}
         </div>
-        <button
+        <button suppressHydrationWarning={true}
           className="carousel-control-prev"
           type="button"
           onClick={() => setCurrentSlide((prev) => (prev - 1 + slidesCount) % slidesCount)}
-          style={{ width: '5%' }}
+          style={{ width: '5%', left: '8px' }}
         >
           <span className="carousel-control-prev-icon bg-dark rounded-circle p-3" aria-hidden="true" style={{ width: '40px', height: '40px', backgroundSize: '20px' }}></span>
           <span className="visually-hidden">Previous</span>
         </button>
-        <button
+        <button suppressHydrationWarning={true}
           className="carousel-control-next"
           type="button"
           onClick={() => setCurrentSlide((prev) => (prev + 1) % slidesCount)}
-          style={{ width: '5%' }}
+          style={{ width: '5%', right: '8px' }}
         >
           <span className="carousel-control-next-icon bg-dark rounded-circle p-3" aria-hidden="true" style={{ width: '40px', height: '40px', backgroundSize: '20px' }}></span>
           <span className="visually-hidden">Next</span>
@@ -195,8 +199,8 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
             <h2 className="h1 fw-bold text-dark mt-1">Shop by Components</h2>
           </div>
           <div className="d-none d-md-flex gap-2">
-            <button className="btn btn-outline-dark rounded-circle" style={{ width: '40px', height: '40px' }}><i className="fas fa-chevron-left"></i></button>
-            <button className="btn btn-outline-dark rounded-circle" style={{ width: '40px', height: '40px' }}><i className="fas fa-chevron-right"></i></button>
+            <button suppressHydrationWarning={true} className="btn btn-outline-dark rounded-circle" style={{ width: '40px', height: '40px' }}><i className="fas fa-chevron-left"></i></button>
+            <button suppressHydrationWarning={true} className="btn btn-outline-dark rounded-circle" style={{ width: '40px', height: '40px' }}><i className="fas fa-chevron-right"></i></button>
           </div>
         </div>
 
@@ -285,7 +289,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
                       </div>
                     )}
 
-                    <button
+                    <button suppressHydrationWarning={true}
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleWishlist(prod);
@@ -352,7 +356,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
                     </div>
 
                     <div className="d-flex gap-2 mt-auto pt-2">
-                      <button
+                      <button suppressHydrationWarning={true}
                         onClick={(e) => {
                           e.stopPropagation();
                           addToCart(prod);
@@ -370,7 +374,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
                       >
                         <ShoppingBagIcon size={16} style={{ marginRight: '8px' }} /> add to cart
                       </button>
-                      <button
+                      <button suppressHydrationWarning={true}
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedProduct(prod);
@@ -461,7 +465,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
                       </div>
                     )}
 
-                    <button
+                    <button suppressHydrationWarning={true}
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleWishlist(prod);
@@ -528,7 +532,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
                     </div>
 
                     <div className="d-flex gap-2 mt-auto pt-2">
-                      <button
+                      <button suppressHydrationWarning={true}
                         onClick={(e) => {
                           e.stopPropagation();
                           addToCart(prod);
@@ -546,7 +550,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
                       >
                         <ShoppingBagIcon size={16} style={{ marginRight: '8px' }} /> add to cart
                       </button>
-                      <button
+                      <button suppressHydrationWarning={true}
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedProduct(prod);
@@ -637,7 +641,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
                       </div>
                     )}
 
-                    <button
+                    <button suppressHydrationWarning={true}
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleWishlist(prod);
@@ -704,7 +708,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
                     </div>
 
                     <div className="d-flex gap-2 mt-auto pt-2">
-                      <button
+                      <button suppressHydrationWarning={true}
                         onClick={(e) => {
                           e.stopPropagation();
                           addToCart(prod);
@@ -722,7 +726,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
                       >
                         <ShoppingBagIcon size={16} style={{ marginRight: '8px' }} /> add to cart
                       </button>
-                      <button
+                      <button suppressHydrationWarning={true}
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedProduct(prod);
@@ -807,7 +811,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
             padding: '40px'
           }} onClick={(e) => e.stopPropagation()}>
             {/* Close Button */}
-            <button
+            <button suppressHydrationWarning={true}
               onClick={() => setShowDetailsModal(false)}
               style={{
                 position: 'absolute',
@@ -970,7 +974,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
                   {/* Action Buttons */}
                   <div style={{ paddingLeft: '15px' }}>
                     <div className="d-flex gap-3 mb-4">
-                      <button
+                      <button suppressHydrationWarning={true}
                         onClick={() => {
                           addToCart(selectedProduct);
                           setShowDetailsModal(false);
@@ -996,7 +1000,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
                       >
                         <ShoppingBagIcon size={18} style={{ marginRight: '8px' }} /> Add to Cart
                       </button>
-                      <button
+                      <button suppressHydrationWarning={true}
                         onClick={() => toggleWishlist(selectedProduct)}
                         className="btn d-flex align-items-center justify-content-center"
                         style={{

@@ -4,7 +4,9 @@ import Product from '@/models/Product';
 import Category from '@/models/Category';
 import HomeClient from '@/components/HomeClient';
 
-export const dynamic = 'force-dynamic';
+// ISR: page is statically cached, refreshes in background every 60 seconds
+// This eliminates the 4,830ms document request latency from force-dynamic
+export const revalidate = 60;
 
 // Server-rendered metadata for search engine indexing
 export const metadata = {
@@ -21,8 +23,13 @@ export const metadata = {
 export default async function Home() {
   await ensureSeeded();
 
-  const products = await Product.find({}).sort({ createdAt: -1 });
-  const categories = await Category.find({});
+  const products = await Product.find({
+    homepageSection: { 
+      $in: ['Featured Products', 'Bestsellers', 'Our Range of Gaming Products'] 
+    },
+    isActive: { $ne: false }
+  }).sort({ createdAt: -1 }).lean();
+  const categories = await Category.find({}).lean();
 
 
   // Format MongoDB documents for secure Next.js Server-Client serialization

@@ -8,7 +8,7 @@ export const metadata = {
     title: 'Contact Us - Satrion Shop',
     description: 'Have a question about our custom PCs, keyboard peripherals, or order deliveries? Contact the Satrion support desk today.',
     type: 'website',
-    url: 'https://satrion.in/contact',
+    url: 'https://satrion.co.in/contact',
   }
 };
 

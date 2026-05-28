@@ -111,10 +111,10 @@ const Header = () => {
       <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top glass d-none d-lg-block" style={{ borderBottom: '1px solid var(--border-color)' }}>
         <div className="container d-flex justify-content-between align-items-center">
           <Link className="navbar-brand text-success logo h1 align-self-center d-flex align-items-center" href="/" style={{ width: 'auto' }}>
-            <img src="/satrion.png?v=2" alt="Satrion Logo" style={{ height: '75px', width: '75%', filter: 'brightness(0)' }} />
+            <img src="/satrion.png?v=2" alt="Satrion Logo" style={{ height: '42px', width: 'auto', filter: 'brightness(0)' }} />
           </Link>
 
-          <button
+          <button suppressHydrationWarning={true}
             className="navbar-toggler border-0"
             type="button"
             data-bs-toggle="collapse"
@@ -146,7 +146,7 @@ const Header = () => {
             <div className="navbar align-self-center d-flex align-items-center gap-4">
               <form action="/shop" method="get" className="d-lg-none flex-sm-fill mt-3 mb-4 col-7 col-sm-auto pr-3">
                 <div className="input-group">
-                  <input 
+                  <input suppressHydrationWarning={true} 
                     type="text" 
                     name="q"
                     className="form-control text-dark bg-light border" 
@@ -155,12 +155,12 @@ const Header = () => {
                     aria-label="Search products"
                     style={{ minHeight: '44px' }}
                   />
-                  <button type="submit" className="input-group-text bg-dark border-0 text-white" aria-label="Submit Search" style={{ cursor: 'pointer' }}>
+                  <button suppressHydrationWarning={true} type="submit" className="input-group-text bg-dark border-0 text-white" aria-label="Submit Search" style={{ cursor: 'pointer' }}>
                     <i className="fa fa-fw fa-search"></i>
                   </button>
                 </div>
               </form>
-              <button
+              <button suppressHydrationWarning={true}
                 className="nav-icon d-none d-lg-inline bg-transparent border-0 p-0"
                 onClick={() => setIsSearchModalOpen(true)}
                 aria-label="Search"
@@ -222,7 +222,7 @@ const Header = () => {
         {/* Row 1: Left Hamburger, Center Logo, Right Profile & Cart */}
         <div className="d-flex align-items-center justify-content-between">
           {/* Left: Hamburger menu toggle */}
-          <button 
+          <button suppressHydrationWarning={true} 
             onClick={() => setIsMobileMenuOpen(true)}
             className="btn p-0 border-0 bg-transparent text-dark"
             style={{ fontSize: '1.45rem', outline: 'none' }}
@@ -286,7 +286,7 @@ const Header = () => {
         <form onSubmit={handleMobileSearchSubmit} className="mt-3">
           <div className="position-relative w-100">
             <i className="fa fa-search position-absolute text-muted" style={{ left: '16px', top: '50%', transform: 'translateY(-50%)', fontSize: '0.95rem' }}></i>
-            <input 
+            <input suppressHydrationWarning={true} 
               type="text"
               className="form-control"
               placeholder="Search for products..."
@@ -332,7 +332,7 @@ const Header = () => {
               <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
                 <img src="/satrion.png?v=2" alt="Satrion Logo" style={{ height: '36px', width: 'auto', filter: 'brightness(0)' }} />
               </Link>
-              <button 
+              <button suppressHydrationWarning={true} 
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="btn border-0 p-0 bg-transparent text-dark"
                 style={{ fontSize: '1.45rem', cursor: 'pointer', outline: 'none' }}
@@ -348,7 +348,7 @@ const Header = () => {
               <form onSubmit={handleMobileSearchSubmit} className="mb-4">
                 <div className="position-relative w-100">
                   <i className="fa fa-search position-absolute text-muted" style={{ left: '16px', top: '50%', transform: 'translateY(-50%)', fontSize: '0.95rem' }}></i>
-                  <input 
+                  <input suppressHydrationWarning={true} 
                     type="text"
                     className="form-control"
                     placeholder="Search CPU, GPU, RAM..."
@@ -384,7 +384,7 @@ const Header = () => {
 
                 {/* Products Dropdown Accordion */}
                 <div className="border-bottom pb-2" style={{ borderColor: '#f1f5f9' }}>
-                  <button 
+                  <button suppressHydrationWarning={true} 
                     onClick={() => setIsProductsDropdownOpen(!isProductsDropdownOpen)}
                     className="w-100 border-0 bg-transparent p-0 py-2 d-flex align-items-center justify-content-between text-dark fw-bold"
                     style={{ fontSize: '1.1rem', outline: 'none' }}
@@ -479,7 +479,7 @@ const Header = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
-            <button 
+            <button suppressHydrationWarning={true} 
               onClick={() => setIsSearchModalOpen(false)}
               style={{
                 position: 'absolute',
@@ -517,7 +517,7 @@ const Header = () => {
               }}
             >
               <div className="input-group">
-                <input 
+                <input suppressHydrationWarning={true} 
                   type="text" 
                   className="form-control form-control-lg border-0 shadow-none text-dark" 
                   id="inputModalSearch" 
@@ -532,7 +532,7 @@ const Header = () => {
                     outline: 'none'
                   }} 
                 />
-                <button 
+                <button suppressHydrationWarning={true} 
                   type="submit" 
                   className="btn btn-dark d-flex align-items-center justify-content-center" 
                   style={{ 
@@ -574,7 +574,7 @@ const Header = () => {
           }} onClick={(e) => e.stopPropagation()}>
             
             {/* Close Button */}
-            <button 
+            <button suppressHydrationWarning={true} 
               onClick={() => setIsLoginModalOpen(false)}
               style={{
                 position: 'absolute',
@@ -608,7 +608,7 @@ const Header = () => {
                   <label className="form-label small fw-bold text-light" style={{ opacity: 0.8 }}>Email Address</label>
                   <div className="input-group">
                     <span className="input-group-text bg-dark border-0 text-muted"><i className="fas fa-envelope"></i></span>
-                    <input 
+                    <input suppressHydrationWarning={true} 
                       type="email" 
                       value={loginEmail} 
                       onChange={(e) => setLoginEmail(e.target.value)} 
@@ -623,7 +623,7 @@ const Header = () => {
                   <label className="form-label small fw-bold text-light" style={{ opacity: 0.8 }}>Password</label>
                   <div className="input-group">
                     <span className="input-group-text bg-dark border-0 text-muted"><i className="fas fa-lock"></i></span>
-                    <input 
+                    <input suppressHydrationWarning={true} 
                       type="password" 
                       value={loginPassword} 
                       onChange={(e) => setLoginPassword(e.target.value)} 
@@ -634,13 +634,13 @@ const Header = () => {
                   </div>
                 </div>
 
-                <button type="submit" className="btn btn-vibrant-gradient w-100 py-3 fw-bold rounded-pill mb-4" style={{ fontSize: '1rem' }}>
+                <button suppressHydrationWarning={true} type="submit" className="btn btn-vibrant-gradient w-100 py-3 fw-bold rounded-pill mb-4" style={{ fontSize: '1rem' }}>
                   Login Now <i className="fas fa-sign-in-alt ms-2"></i>
                 </button>
                 
                 <p className="text-center text-muted mb-0" style={{ fontSize: '0.85rem' }}>
                   Don't have an account?{' '}
-                  <button type="button" onClick={() => setIsLoginView(false)} style={{ color: '#c084fc', background: 'none', border: 'none', padding: 0, fontWeight: '600' }}>
+                  <button suppressHydrationWarning={true} type="button" onClick={() => setIsLoginView(false)} style={{ color: '#c084fc', background: 'none', border: 'none', padding: 0, fontWeight: '600' }}>
                     Sign Up
                   </button>
                 </p>
@@ -657,7 +657,7 @@ const Header = () => {
                   <label className="form-label small fw-bold text-light" style={{ opacity: 0.8 }}>Username</label>
                   <div className="input-group">
                     <span className="input-group-text bg-dark border-0 text-muted d-flex align-items-center"><UserIcon size={16} /></span>
-                    <input 
+                    <input suppressHydrationWarning={true} 
                       type="text" 
                       value={signupUsername} 
                       onChange={(e) => setSignupUsername(e.target.value)} 
@@ -672,7 +672,7 @@ const Header = () => {
                   <label className="form-label small fw-bold text-light" style={{ opacity: 0.8 }}>Email Address</label>
                   <div className="input-group">
                     <span className="input-group-text bg-dark border-0 text-muted"><i className="fas fa-envelope"></i></span>
-                    <input 
+                    <input suppressHydrationWarning={true} 
                       type="email" 
                       value={signupEmail} 
                       onChange={(e) => setSignupEmail(e.target.value)} 
@@ -687,7 +687,7 @@ const Header = () => {
                   <label className="form-label small fw-bold text-light" style={{ opacity: 0.8 }}>Phone Number</label>
                   <div className="input-group">
                     <span className="input-group-text bg-dark border-0 text-muted"><i className="fas fa-phone"></i></span>
-                    <input 
+                    <input suppressHydrationWarning={true} 
                       type="tel" 
                       value={signupPhone} 
                       onChange={(e) => setSignupPhone(e.target.value.replace(/\D/g, '').slice(0, 10))} 
@@ -703,7 +703,7 @@ const Header = () => {
                   <label className="form-label small fw-bold text-light" style={{ opacity: 0.8 }}>Password</label>
                   <div className="input-group">
                     <span className="input-group-text bg-dark border-0 text-muted"><i className="fas fa-lock"></i></span>
-                    <input 
+                    <input suppressHydrationWarning={true} 
                       type="password" 
                       value={signupPassword} 
                       onChange={(e) => setSignupPassword(e.target.value)} 
@@ -718,7 +718,7 @@ const Header = () => {
                   <label className="form-label small fw-bold text-light" style={{ opacity: 0.8 }}>Confirm Password</label>
                   <div className="input-group">
                     <span className="input-group-text bg-dark border-0 text-muted"><i className="fas fa-check-double"></i></span>
-                    <input 
+                    <input suppressHydrationWarning={true} 
                       type="password" 
                       value={signupConfirmPassword} 
                       onChange={(e) => setSignupConfirmPassword(e.target.value)} 
@@ -729,13 +729,13 @@ const Header = () => {
                   </div>
                 </div>
 
-                <button type="submit" className="btn btn-vibrant-gradient w-100 py-3 fw-bold rounded-pill mb-4" style={{ fontSize: '1rem' }}>
+                <button suppressHydrationWarning={true} type="submit" className="btn btn-vibrant-gradient w-100 py-3 fw-bold rounded-pill mb-4" style={{ fontSize: '1rem' }}>
                   Create Account <i className="fas fa-user-plus ms-2"></i>
                 </button>
                 
                 <p className="text-center text-muted mb-0" style={{ fontSize: '0.85rem' }}>
                   Already have an account?{' '}
-                  <button type="button" onClick={() => setIsLoginView(true)} style={{ color: '#38bdf8', background: 'none', border: 'none', padding: 0, fontWeight: '600' }}>
+                  <button suppressHydrationWarning={true} type="button" onClick={() => setIsLoginView(true)} style={{ color: '#38bdf8', background: 'none', border: 'none', padding: 0, fontWeight: '600' }}>
                     Login
                   </button>
                 </p>

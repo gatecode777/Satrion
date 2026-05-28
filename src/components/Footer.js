@@ -11,7 +11,7 @@ const Footer = () => {
                     <div className="col-md-3 pt-5">
                         <div className="border-bottom pb-3 mb-4 d-flex align-items-center" style={{ borderColor: 'rgba(255,255,255,0.1) !important', minHeight: '60px' }}>
                             <Link className="navbar-brand logo h1 align-self-center d-inline-block m-0" href="/">
-                                <img src="/satrion.png?v=2" alt="Satrion Logo" style={{ height: '34px', width: '171px' }} />
+                                <img src="/satrion.png?v=2" alt="Satrion Logo" style={{ height: '34px', width: 'auto' }} />
                             </Link>
                         </div>
                         <ul className="list-unstyled footer-link-list" style={{ opacity: 0.8, lineHeight: '2' }}>

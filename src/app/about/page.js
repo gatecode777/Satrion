@@ -20,7 +20,7 @@ const About = () => {
         {/* Decorative background elements */}
         <div style={{ position: 'absolute', top: '-100px', left: '-100px', width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(56,189,248,0.2) 0%, rgba(15,23,42,0) 70%)', borderRadius: '50%' }}></div>
         <div style={{ position: 'absolute', bottom: '-100px', right: '-100px', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(192,132,252,0.2) 0%, rgba(15,23,42,0) 70%)', borderRadius: '50%' }}></div>
-        
+
         <div className="container position-relative z-1">
           <div className="row align-items-center py-5">
             <div className="col-lg-6 text-white mb-5 mb-lg-0 animate-fade-in-up" style={{ zIndex: 2 }}>
@@ -100,7 +100,7 @@ const About = () => {
         <div className="container my-4">
           <div className="row text-center py-3">
             <div className="col-lg-6 m-auto">
-              <h1 className="h1 text-dark">Our Brands</h1>
+              <h1 className="h1 text-dark" >Our Brands</h1>
               <p className="text-muted">
                 We are proud to partner with leading brands in the industry to provide our customers with the best products and services.
               </p>

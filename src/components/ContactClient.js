@@ -148,7 +148,7 @@ const ContactClient = () => {
                     <div className="row">
                       <div className="form-group col-md-6 mb-4">
                         <label htmlFor="name" className="text-dark fw-bold mb-2">Name</label>
-                        <input
+                        <input suppressHydrationWarning={true}
                           type="text"
                           className="form-control bg-light border-0"
                           id="name"
@@ -164,7 +164,7 @@ const ContactClient = () => {
                       </div>
                       <div className="form-group col-md-6 mb-4">
                         <label htmlFor="email" className="text-dark fw-bold mb-2">Email</label>
-                        <input
+                        <input suppressHydrationWarning={true}
                           type="email"
                           className="form-control bg-light border-0"
                           id="email"
@@ -181,7 +181,7 @@ const ContactClient = () => {
                     </div>
                     <div className="mb-4">
                       <label htmlFor="subject" className="text-dark fw-bold mb-2">Subject</label>
-                      <input
+                      <input suppressHydrationWarning={true}
                         type="text"
                         className="form-control bg-light border-0"
                         id="subject"
@@ -197,7 +197,7 @@ const ContactClient = () => {
                     </div>
                     <div className="mb-4">
                       <label htmlFor="message" className="text-dark fw-bold mb-2">Message</label>
-                      <textarea
+                      <textarea suppressHydrationWarning={true}
                         className="form-control bg-light border-0"
                         id="message"
                         name="message"
@@ -213,7 +213,7 @@ const ContactClient = () => {
                     </div>
                     <div className="row">
                       <div className="col mt-2">
-                        <button type="submit" disabled={loading} className="btn btn-primary-gradient px-5 py-3 hover-lift" style={{ borderRadius: '30px', fontWeight: '600', fontSize: '1.1rem' }}>
+                        <button suppressHydrationWarning={true} type="submit" disabled={loading} className="btn btn-primary-gradient px-5 py-3 hover-lift" style={{ borderRadius: '30px', fontWeight: '600', fontSize: '1.1rem' }}>
                           {loading ? 'Sending...' : <><i className="fas fa-paper-plane me-2"></i> Send Message</>}
                         </button>
                       </div>

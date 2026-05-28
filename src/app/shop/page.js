@@ -35,31 +35,95 @@ export async function generateMetadata({ searchParams }) {
   };
 }
 
-export default async function ShopPage() {
+export default async function ShopPage({ searchParams }) {
   await ensureSeeded();
 
-  const products = await Product.find({}).sort({ createdAt: -1 });
-  const categories = await Category.find({});
+  const resolvedParams = await searchParams;
+  const category = resolvedParams?.category || 'All';
+  const query = resolvedParams?.q || '';
+  const sort = resolvedParams?.sort || 'Featured';
+  const page = parseInt(resolvedParams?.page || '1', 10);
+  const minPrice = parseInt(resolvedParams?.minPrice || '50000', 10);
+  const maxPrice = parseInt(resolvedParams?.maxPrice || '150000', 10);
 
+  const itemsPerPage = 9;
+
+  // Build MongoDB query
+  const dbQuery = { isActive: { $ne: false } };
+
+  // Category filter
+  if (category !== 'All') {
+    dbQuery.category = category;
+  }
+
+  // Price filter
+  dbQuery.price = {
+    $gte: minPrice,
+    $lte: maxPrice
+  };
+
+  // Search filter
+  if (query) {
+    dbQuery.$or = [
+      { name: { $regex: query, $options: 'i' } },
+      { description: { $regex: query, $options: 'i' } },
+      { category: { $regex: query, $options: 'i' } }
+    ];
+  }
+
+  // Define sort option
+  let sortOption = {};
+  if (sort === 'A to Z') {
+    sortOption = { name: 1 };
+  } else if (sort === 'Price: Low to High') {
+    sortOption = { price: 1 };
+  } else if (sort === 'Price: High to Low') {
+    sortOption = { price: -1 };
+  } else {
+    // Featured / default
+    sortOption = { createdAt: -1 };
+  }
+
+  // Fetch paginated products and total count
+  const products = await Product.find(dbQuery)
+    .sort(sortOption)
+    .skip((page - 1) * itemsPerPage)
+    .limit(itemsPerPage)
+    .lean();
+
+  const totalItems = await Product.countDocuments(dbQuery);
+  const categories = await Category.find({}).lean();
+
+  // Fetch product counts per category (using server-side aggregation for speed)
+  const categoryCounts = await Product.aggregate([
+    { $match: { isActive: { $ne: false } } },
+    { $group: { _id: '$category', count: { $sum: 1 } } }
+  ]);
+
+  const countsMap = {};
+  categoryCounts.forEach(c => {
+    if (c._id) countsMap[c._id] = c.count;
+  });
+
+  const totalProductsCount = await Product.countDocuments({ isActive: { $ne: false } });
 
   // Format MongoDB documents for secure Next.js Server-Client serialization
   const serializedProducts = products.map((p) => {
-    const obj = p.toObject ? p.toObject() : p;
     return {
-      ...obj,
-      id: obj._id ? obj._id.toString() : '',
-      _id: obj._id ? obj._id.toString() : '',
-      createdAt: obj.createdAt ? obj.createdAt.toISOString() : null,
-      updatedAt: obj.updatedAt ? obj.updatedAt.toISOString() : null,
+      ...p,
+      id: p._id ? p._id.toString() : '',
+      _id: p._id ? p._id.toString() : '',
+      createdAt: p.createdAt ? p.createdAt.toISOString() : null,
+      updatedAt: p.updatedAt ? p.updatedAt.toISOString() : null,
     };
   });
 
   const serializedCategories = categories.map((c) => {
-    const obj = c.toObject ? c.toObject() : c;
     return {
-      ...obj,
-      id: obj._id ? obj._id.toString() : '',
-      _id: obj._id ? obj._id.toString() : '',
+      ...c,
+      id: c._id ? c._id.toString() : '',
+      _id: c._id ? c._id.toString() : '',
+      count: countsMap[c.name] || 0
     };
   });
 
@@ -67,7 +131,9 @@ export default async function ShopPage() {
     <Suspense fallback={<div className="container py-5 text-center"><h4>Loading shop...</h4></div>}>
       <ShopClient 
         initialCategories={serializedCategories} 
-        initialProducts={serializedProducts} 
+        initialProducts={serializedProducts}
+        totalItems={totalItems}
+        totalProductsCount={totalProductsCount}
       />
     </Suspense>
   );

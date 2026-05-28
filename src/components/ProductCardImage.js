@@ -57,6 +57,8 @@ export default function ProductCardImage({ src, alt, fallback }) {
       <img
         src={src || fallback}
         alt={alt}
+        loading="lazy"
+        decoding="async"
         className="card-img img-fluid"
         style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain', width: 'auto', height: 'auto', pointerEvents: 'none' }}
       />
