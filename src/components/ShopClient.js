@@ -153,6 +153,36 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
   const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
   const paginatedProducts = sortedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
 
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5;
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      pages.push(1);
+      let start = Math.max(2, currentPage - 1);
+      let end = Math.min(totalPages - 1, currentPage + 1);
+      if (currentPage <= 3) {
+        end = 4;
+      } else if (currentPage >= totalPages - 2) {
+        start = totalPages - 3;
+      }
+      if (start > 2) {
+        pages.push('ellipsis-start');
+      }
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+      if (end < totalPages - 1) {
+        pages.push('ellipsis-end');
+      }
+      pages.push(totalPages);
+    }
+    return pages;
+  };
+
   const handlePageChange = (pageNum) => {
     setCurrentPage(pageNum);
     if (typeof window !== 'undefined') {
@@ -1357,8 +1387,19 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                     </li>
 
                     {/* Page Numbers */}
-                    {[...Array(totalPages)].map((_, index) => {
-                      const pageNum = index + 1;
+                    {getPageNumbers().map((pageNum, index) => {
+                      if (pageNum === 'ellipsis-start' || pageNum === 'ellipsis-end') {
+                        return (
+                          <li key={pageNum + '-' + index} className="page-item disabled">
+                            <span 
+                              className="d-flex align-items-center justify-content-center text-muted"
+                              style={{ width: '42px', height: '42px', fontSize: '1rem', fontWeight: '600' }}
+                            >
+                              ...
+                            </span>
+                          </li>
+                        );
+                      }
                       const isActive = currentPage === pageNum;
                       return (
                         <li key={pageNum} className={`page-item ${isActive ? 'active' : ''}`}>
