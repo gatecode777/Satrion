@@ -42,7 +42,7 @@ export async function PATCH(req, { params }) {
     const order = await Order.findByIdAndUpdate(
       id,
       { $set: updateFields },
-      { new: true }
+      { returnDocument: 'after' }
     ).populate('userId', 'username email');
 
     if (!order) {

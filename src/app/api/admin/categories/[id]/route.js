@@ -24,7 +24,7 @@ export async function PATCH(req, { params }) {
     const category = await Category.findByIdAndUpdate(
       id,
       { $set: body },
-      { new: true }
+      { returnDocument: 'after' }
     );
     if (!category) return NextResponse.json({ error: 'Category not found' }, { status: 404 });
     return NextResponse.json({ category });

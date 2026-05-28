@@ -33,7 +33,7 @@ export async function PATCH(req, { params }) {
     const product = await Product.findByIdAndUpdate(
       id,
       { $set: body },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     if (!product) {

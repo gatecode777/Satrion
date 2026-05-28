@@ -16,7 +16,7 @@ export async function GET(req) {
     const user = await User.findOneAndUpdate(
       { email: email.toLowerCase() },
       { $set: { isAdmin: true } },
-      { new: true }
+      { returnDocument: 'after' }
     ).select('-password');
 
     if (!user) {

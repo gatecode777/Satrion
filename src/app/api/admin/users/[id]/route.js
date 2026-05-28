@@ -23,7 +23,7 @@ export async function PATCH(req, { params }) {
     const user = await User.findByIdAndUpdate(
       id,
       { $set: body },
-      { new: true }
+      { returnDocument: 'after' }
     ).select('-password');
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
     return NextResponse.json({ user });
