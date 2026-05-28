@@ -5,6 +5,21 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useShop } from '@/context/ShopContext';
 import { toast } from 'react-toastify';
+import ProductCardImage from './ProductCardImage';
+
+const formatPrice = (price) => {
+  if (price === undefined || price === null) return '₹0';
+  if (typeof price === 'number') {
+    return '₹' + price.toLocaleString('en-IN');
+  }
+  if (typeof price === 'string') {
+    if (price.includes('₹')) return price;
+    const cleanStr = price.replace(/[₹,]/g, '').trim();
+    const num = parseFloat(cleanStr);
+    return isNaN(num) ? '₹' + price : '₹' + num.toLocaleString('en-IN');
+  }
+  return '₹' + price;
+};
 
 const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
   const searchParams = useSearchParams();
@@ -17,7 +32,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const { addToCart, toggleWishlist, wishlist } = useShop();
-  
+
   const isWishlisted = (productId) => wishlist.some((item) => item.id === productId);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
@@ -31,6 +46,8 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
     productname: ''
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9;
 
   useEffect(() => {
     // Reset scroll when mounting
@@ -72,12 +89,17 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
   // Filter products based on selected category & search query
   const filteredProducts = dbProducts.filter(product => {
     const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
-    const matchesSearch = !searchQuery || 
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    const matchesSearch = !searchQuery ||
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (product.description && product.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (product.category && product.category.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesCategory && matchesSearch;
   });
+
+  // Reset pagination to page 1 on search or category filter change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, sortBy, searchQuery]);
 
   // Sort products based on selected sort option
   const getSortedProducts = () => {
@@ -97,6 +119,24 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
   };
 
   const sortedProducts = getSortedProducts();
+
+  // Pagination Calculations
+  const totalPages = Math.max(1, Math.ceil(sortedProducts.length / itemsPerPage));
+  const indexOfLastProduct = currentPage * itemsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
+  const paginatedProducts = sortedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+
+  const handlePageChange = (pageNum) => {
+    setCurrentPage(pageNum);
+    if (typeof window !== 'undefined') {
+      const gridElement = document.getElementById('shop-products-grid');
+      if (gridElement) {
+        gridElement.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  };
 
   const handleSortChange = (e) => {
     setSortBy(e.target.value);
@@ -528,7 +568,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
             padding: '40px'
           }} onClick={(e) => e.stopPropagation()}>
             {/* Close Button */}
-            <button 
+            <button
               onClick={() => setShowDetailsModal(false)}
               style={{
                 position: 'absolute',
@@ -565,22 +605,22 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
               <div className="row text-start align-items-stretch">
                 {/* Left Column: Image Gallery */}
                 <div className="col-md-6 mb-4 mb-md-0 d-flex flex-column">
-                  <div style={{ 
-                    padding: '24px', 
-                    backgroundColor: '#ffffff', 
-                    borderRadius: '20px', 
+                  <div style={{
+                    padding: '24px',
+                    backgroundColor: '#ffffff',
+                    borderRadius: '20px',
                     border: '1px solid #f1f5f9',
                     boxShadow: '0 4px 20px rgba(15, 23, 42, 0.02)',
-                    display: 'flex', 
-                    alignItems: 'center', 
+                    display: 'flex',
+                    alignItems: 'center',
                     justifyContent: 'center',
                     minHeight: '350px',
                     flexGrow: 1
                   }}>
-                    <img 
-                      src={getCleanImageUrl(selectedProduct.image)} 
-                      alt={selectedProduct.name} 
-                      style={{ width: '100%', height: 'auto', maxHeight: '320px', objectFit: 'contain' }} 
+                    <ProductCardImage
+                      src={getCleanImageUrl(selectedProduct.image)}
+                      alt={selectedProduct.name}
+                      fallback=""
                     />
                   </div>
                   {/* Gallery Thumbnails */}
@@ -597,10 +637,10 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                       justifyContent: 'center',
                       cursor: 'pointer'
                     }}>
-                      <img 
-                        src={getCleanImageUrl(selectedProduct.image)} 
-                        alt="Thumbnail" 
-                        style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} 
+                      <img
+                        src={getCleanImageUrl(selectedProduct.image)}
+                        alt="Thumbnail"
+                        style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
                       />
                     </div>
                   </div>
@@ -609,12 +649,12 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                 {/* Right Column: Product Info */}
                 <div className="col-md-6 d-flex flex-column justify-content-between">
                   <div style={{ paddingLeft: '15px' }}>
-                    <span 
-                      style={{ 
-                        color: '#00a2e8', 
-                        fontSize: '0.85rem', 
-                        fontWeight: '700', 
-                        textTransform: 'uppercase', 
+                    <span
+                      style={{
+                        color: '#00a2e8',
+                        fontSize: '0.85rem',
+                        fontWeight: '700',
+                        textTransform: 'uppercase',
                         letterSpacing: '1px',
                         display: 'block',
                         marginBottom: '8px'
@@ -622,11 +662,11 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                     >
                       {selectedProduct.category}
                     </span>
-                    <h2 
-                      className="text-dark fw-bold mb-2" 
-                      style={{ 
-                        fontSize: '1.8rem', 
-                        lineHeight: '1.2', 
+                    <h2
+                      className="text-dark fw-bold mb-2"
+                      style={{
+                        fontSize: '1.8rem',
+                        lineHeight: '1.2',
                         fontWeight: '800',
                         wordBreak: 'break-word',
                         overflowWrap: 'break-word'
@@ -634,7 +674,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                     >
                       {selectedProduct.name}
                     </h2>
-                    
+
                     {/* Rating Section */}
                     <div className="d-flex align-items-center gap-2 mb-3">
                       <div className="d-flex gap-1">
@@ -646,25 +686,25 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                     </div>
 
                     {/* Price Section */}
-                    <h2 
-                      className="text-dark fw-bold mb-3" 
-                      style={{ 
-                        fontSize: '2rem', 
+                    <h2
+                      className="text-dark fw-bold mb-3"
+                      style={{
+                        fontSize: '2rem',
                         fontWeight: '800',
                         color: '#0f172a'
                       }}
                     >
-                      {selectedProduct.price}
+                      {formatPrice(selectedProduct.price)}
                     </h2>
 
                     {/* Description Section */}
                     <div className="mb-4">
-                      <span 
-                        style={{ 
-                          fontSize: '0.85rem', 
-                          fontWeight: '700', 
-                          color: '#475569', 
-                          textTransform: 'uppercase', 
+                      <span
+                        style={{
+                          fontSize: '0.85rem',
+                          fontWeight: '700',
+                          color: '#475569',
+                          textTransform: 'uppercase',
                           letterSpacing: '1px',
                           display: 'block',
                           marginBottom: '8px'
@@ -672,11 +712,11 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                       >
                         Description
                       </span>
-                      <p 
-                        className="text-muted" 
-                        style={{ 
+                      <p
+                        className="text-muted"
+                        style={{
                           fontSize: '0.95rem',
-                          lineHeight: '1.6', 
+                          lineHeight: '1.6',
                           whiteSpace: 'pre-line',
                           wordBreak: 'break-word',
                           overflowWrap: 'break-word',
@@ -736,7 +776,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                           e.currentTarget.style.backgroundColor = '#ffffff';
                         }}
                       >
-                        <i 
+                        <i
                           className={isWishlisted(selectedProduct.id) ? "fas fa-heart text-danger" : "far fa-heart"}
                           style={{ fontSize: '1.2rem', color: isWishlisted(selectedProduct.id) ? '#ef4444' : '#64748b' }}
                         ></i>
@@ -855,34 +895,21 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
               </div>
             )}
             {/* Top Bar */}
-            <div className="row">
-              <div className="col-md-6">
-                <ul className="list-inline shop-top-menu pb-3 pt-1">
-                  {categories.map((category) => (
-                    <li key={category.name} className="list-inline-item">
-                      <button
-                        className={`h3 text-decoration-none mr-3 ${selectedCategory === category.name ? 'text-dark fw-bold' : 'text-muted'}`}
-                        onClick={() => setSelectedCategory(category.name)}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          cursor: 'pointer',
-                          fontSize: '1.2rem'
-                        }}
-                      >
-                        {category.name} ({category.count})
-                      </button>
-                    </li>
-                  ))}
-                </ul>
+            <div className="row align-items-center mb-4 pb-2">
+              <div className="col-md-6 col-12 mb-3 mb-md-0">
+                <h4 className="fw-bold mb-0 text-dark" style={{ letterSpacing: '-0.5px' }}>
+                  {selectedCategory === 'All' ? 'All Products' : selectedCategory}
+                  <span className="text-muted fs-6 fw-normal ms-2">({sortedProducts.length} items)</span>
+                </h4>
               </div>
-              <div className="col-md-6 pb-4">
-                <div className="d-flex">
+              <div className="col-md-6 col-12 d-flex justify-content-md-end">
+                <div className="d-flex align-items-center gap-2 w-100 justify-content-md-end">
+                  <span className="text-muted small text-nowrap d-none d-sm-inline">Sort By:</span>
                   <select
-                    className="form-control text-dark border-secondary"
+                    className="form-select text-dark border shadow-sm"
                     value={sortBy}
                     onChange={handleSortChange}
-                    style={{ cursor: 'pointer' }}
+                    style={{ cursor: 'pointer', minWidth: '180px', borderRadius: '8px', padding: '8px 12px' }}
                   >
                     <option>Featured</option>
                     <option>A to Z</option>
@@ -894,16 +921,16 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
             </div>
 
             {/* Products */}
-            <div className="row">
-              {sortedProducts.length > 0 ? (
-                sortedProducts.map((product) => (
+            <div className="row" id="shop-products-grid">
+              {paginatedProducts.length > 0 ? (
+                paginatedProducts.map((product) => (
                   <div className="col-md-4 mb-4" key={product.id}>
-                    <div 
+                    <div
                       onClick={() => { setSelectedProduct(product); setShowDetailsModal(true); }}
-                      className="card product-wap border-0 overflow-hidden shadow-sm h-100 d-flex flex-column" 
+                      className="card product-wap border-0 overflow-hidden shadow-sm h-100 d-flex flex-column"
                       style={{ backgroundColor: '#ffffff', borderRadius: '16px', position: 'relative', cursor: 'pointer' }}
                     >
-                      
+
                       {/* Image Block with Floating Badges */}
                       <div style={{ padding: '24px', backgroundColor: '#ffffff', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '280px', position: 'relative', borderBottom: '1px solid #f1f5f9' }}>
                         {product.rating >= 4 ? (
@@ -998,7 +1025,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
                               {product.name}
                             </button>
                             <span className="h5 fw-bold text-dark mb-0 text-nowrap" style={{ fontSize: '1.2rem' }}>
-                              ₹{product.price ? product.price.toLocaleString('en-IN') : '99,999'}
+                              {formatPrice(product.price)}
                             </span>
                           </div>
 
@@ -1066,37 +1093,84 @@ const ShopClient = ({ initialCategories = [], initialProducts = [] }) => {
             </div>
 
             {/* Pagination */}
-            <div className="row mt-4">
-              <ul className="pagination justify-content-end">
-                <li className="page-item">
-                  <Link
-                    className="page-link active"
-                    href="#"
-                    onClick={(e) => e.preventDefault()}
-                  >
-                    1
-                  </Link>
-                </li>
-                <li className="page-item">
-                  <Link
-                    className="page-link"
-                    href="#"
-                    onClick={(e) => e.preventDefault()}
-                  >
-                    2
-                  </Link>
-                </li>
-                <li className="page-item">
-                  <Link
-                    className="page-link"
-                    href="#"
-                    onClick={(e) => e.preventDefault()}
-                  >
-                    3
-                  </Link>
-                </li>
-              </ul>
-            </div>
+            {totalPages > 1 && (
+              <div className="row mt-5">
+                <nav aria-label="Product Page Navigation">
+                  <ul className="pagination justify-content-center align-items-center gap-2">
+                    {/* Previous Button */}
+                    <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                      <button
+                        className="page-link shadow-sm d-flex align-items-center justify-content-center"
+                        style={{
+                          borderRadius: '12px',
+                          width: '42px',
+                          height: '42px',
+                          border: '1px solid #e2e8f0',
+                          backgroundColor: '#ffffff',
+                          color: '#0f172a',
+                          fontWeight: '600',
+                          transition: 'all 0.2s ease',
+                          cursor: currentPage === 1 ? 'not-allowed' : 'pointer'
+                        }}
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                      >
+                        <i className="fas fa-chevron-left"></i>
+                      </button>
+                    </li>
+
+                    {/* Page Numbers */}
+                    {[...Array(totalPages)].map((_, index) => {
+                      const pageNum = index + 1;
+                      const isActive = currentPage === pageNum;
+                      return (
+                        <li key={pageNum} className={`page-item ${isActive ? 'active' : ''}`}>
+                          <button
+                            className="page-link shadow-sm d-flex align-items-center justify-content-center"
+                            style={{
+                              borderRadius: '12px',
+                              width: '42px',
+                              height: '42px',
+                              border: '1px solid ' + (isActive ? '#0f172a' : '#e2e8f0'),
+                              backgroundColor: isActive ? '#0f172a' : '#ffffff',
+                              color: isActive ? '#ffffff' : '#0f172a',
+                              fontWeight: '600',
+                              transition: 'all 0.2s ease',
+                              cursor: 'pointer'
+                            }}
+                            onClick={() => handlePageChange(pageNum)}
+                          >
+                            {pageNum}
+                          </button>
+                        </li>
+                      );
+                    })}
+
+                    {/* Next Button */}
+                    <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                      <button
+                        className="page-link shadow-sm d-flex align-items-center justify-content-center"
+                        style={{
+                          borderRadius: '12px',
+                          width: '42px',
+                          height: '42px',
+                          border: '1px solid #e2e8f0',
+                          backgroundColor: '#ffffff',
+                          color: '#0f172a',
+                          fontWeight: '600',
+                          transition: 'all 0.2s ease',
+                          cursor: currentPage === totalPages ? 'not-allowed' : 'pointer'
+                        }}
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                      >
+                        <i className="fas fa-chevron-right"></i>
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            )}
           </div>
         </div>
       </div>

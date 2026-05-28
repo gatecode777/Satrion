@@ -3,6 +3,21 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useShop } from '@/context/ShopContext';
+import ProductCardImage from './ProductCardImage';
+
+const formatPrice = (price) => {
+  if (price === undefined || price === null) return '₹0';
+  if (typeof price === 'number') {
+    return '₹' + price.toLocaleString('en-IN');
+  }
+  if (typeof price === 'string') {
+    if (price.includes('₹')) return price;
+    const cleanStr = price.replace(/[₹,]/g, '').trim();
+    const num = parseFloat(cleanStr);
+    return isNaN(num) ? '₹' + price : '₹' + num.toLocaleString('en-IN');
+  }
+  return '₹' + price;
+};
 
 const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
   const { addToCart, toggleWishlist, wishlist } = useShop();
@@ -37,13 +52,13 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
     }
 
     // Filter products locally for the sections
-    const featured = initialProducts.filter(p => p.homepageSection === 'Featured Products' && p.isActive !== false).slice(0, 6);
+    const featured = initialProducts.filter(p => p.homepageSection === 'Featured Products' && p.isActive !== false).slice(0, 9);
     setFeaturedProducts(featured);
 
-    const bestsellers = initialProducts.filter(p => p.homepageSection === 'Bestsellers' && p.isActive !== false).slice(0, 6);
+    const bestsellers = initialProducts.filter(p => p.homepageSection === 'Bestsellers' && p.isActive !== false).slice(0, 9);
     setBestsellerProducts(bestsellers);
 
-    const gaming = initialProducts.filter(p => p.homepageSection === 'Our Range of Gaming Products' && p.isActive !== false).slice(0, 6);
+    const gaming = initialProducts.filter(p => p.homepageSection === 'Our Range of Gaming Products' && p.isActive !== false).slice(0, 9);
     setGamingProducts(gaming);
   }, [initialProducts]);
 
@@ -69,12 +84,12 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
       <div id="hero-carousel" className="carousel slide carousel-fade">
         <div className="carousel-indicators">
           {[...Array(slidesCount)].map((_, idx) => (
-            <button 
+            <button
               key={idx}
-              type="button" 
+              type="button"
               onClick={() => setCurrentSlide(idx)}
-              className={currentSlide === idx ? 'active' : ''} 
-              aria-current={currentSlide === idx ? 'true' : 'false'} 
+              className={currentSlide === idx ? 'active' : ''}
+              aria-current={currentSlide === idx ? 'true' : 'false'}
               aria-label={`Slide ${idx + 1}`}
             ></button>
           ))}
@@ -113,18 +128,18 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
             </div>
           ))}
         </div>
-        <button 
-          className="carousel-control-prev" 
-          type="button" 
+        <button
+          className="carousel-control-prev"
+          type="button"
           onClick={() => setCurrentSlide((prev) => (prev - 1 + slidesCount) % slidesCount)}
           style={{ width: '5%' }}
         >
           <span className="carousel-control-prev-icon bg-dark rounded-circle p-3" aria-hidden="true" style={{ width: '40px', height: '40px', backgroundSize: '20px' }}></span>
           <span className="visually-hidden">Previous</span>
         </button>
-        <button 
-          className="carousel-control-next" 
-          type="button" 
+        <button
+          className="carousel-control-next"
+          type="button"
           onClick={() => setCurrentSlide((prev) => (prev + 1) % slidesCount)}
           style={{ width: '5%' }}
         >
@@ -319,7 +334,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
                           {prod.name}
                         </h5>
                         <span className="h5 fw-bold text-dark mb-0 text-nowrap" style={{ fontSize: '1.2rem' }}>
-                          {prod.price}
+                          {formatPrice(prod.price)}
                         </span>
                       </div>
 
@@ -406,7 +421,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
                 >
 
                   {/* Image Block with Floating Badges */}
-                  <div style={{ padding: '24px', backgroundColor: '#ffffff', display: 'flex', justifycontent: 'center', alignItems: 'center', height: '280px', position: 'relative', borderBottom: '1px solid #f1f5f9' }}>
+                  <div style={{ padding: '24px', backgroundColor: '#ffffff', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '280px', position: 'relative', borderBottom: '1px solid #f1f5f9' }}>
                     {prod.rating >= 4 ? (
                       <div
                         style={{
@@ -495,7 +510,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
                           {prod.name}
                         </h5>
                         <span className="h5 fw-bold text-dark mb-0 text-nowrap" style={{ fontSize: '1.2rem' }}>
-                          {prod.price}
+                          {formatPrice(prod.price)}
                         </span>
                       </div>
 
@@ -582,7 +597,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
                 >
 
                   {/* Image Block with Floating Badges */}
-                  <div style={{ padding: '24px', backgroundColor: '#ffffff', display: 'flex', justifycontent: 'center', alignItems: 'center', height: '280px', position: 'relative', borderBottom: '1px solid #f1f5f9' }}>
+                  <div style={{ padding: '24px', backgroundColor: '#ffffff', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '280px', position: 'relative', borderBottom: '1px solid #f1f5f9' }}>
                     {prod.rating >= 4 ? (
                       <div
                         style={{
@@ -671,7 +686,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
                           {prod.name}
                         </h5>
                         <span className="h5 fw-bold text-dark mb-0 text-nowrap" style={{ fontSize: '1.2rem' }}>
-                          {prod.price}
+                          {formatPrice(prod.price)}
                         </span>
                       </div>
 
@@ -840,10 +855,10 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
                     minHeight: '350px',
                     flexGrow: 1
                   }}>
-                    <img
+                    <ProductCardImage
                       src={getCleanImageUrl(selectedProduct.image)}
                       alt={selectedProduct.name}
-                      style={{ width: '100%', height: 'auto', maxHeight: '320px', objectFit: 'contain' }}
+                      fallback=""
                     />
                   </div>
                   {/* Gallery Thumbnails */}
@@ -917,7 +932,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
                         color: '#0f172a'
                       }}
                     >
-                      {selectedProduct.price}
+                      {formatPrice(selectedProduct.price)}
                     </h2>
 
                     {/* Description Section */}

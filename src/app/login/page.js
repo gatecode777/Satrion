@@ -48,6 +48,25 @@ const Login = () => {
 
       <div className="container d-flex justify-content-center position-relative" style={{ zIndex: 2 }}>
         <div className="card glass-premium p-4 p-md-5 text-white" style={{ maxWidth: '480px', width: '100%', borderRadius: '24px' }}>
+          {/* Back Button */}
+          <div className="mb-4">
+            <Link 
+              href="/" 
+              className="text-decoration-none d-inline-flex align-items-center"
+              style={{ color: '#94a3b8', transition: 'all 0.2s ease', fontSize: '0.9rem', fontWeight: '500' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = '#38bdf8';
+                e.currentTarget.querySelector('.fa-arrow-left').style.transform = 'translateX(-4px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = '#94a3b8';
+                e.currentTarget.querySelector('.fa-arrow-left').style.transform = 'none';
+              }}
+            >
+              <i className="fas fa-arrow-left me-2" style={{ transition: 'transform 0.2s ease' }}></i> Back to Home
+            </Link>
+          </div>
+
           {/* Header */}
           <div className="text-center mb-4">
             <h2 className="fw-bold mb-2">Welcome Back</h2>
@@ -111,12 +130,6 @@ const Login = () => {
               Don't have an account?{' '}
               <Link href="/signup" style={{ color: '#c084fc', fontWeight: '600' }} className="text-decoration-none">
                 Sign Up
-              </Link>
-            </p>
-            <p className="text-center mb-0" style={{ fontSize: '0.82rem' }}>
-              <Link href="/admin/login" style={{ color: '#475569', fontSize: '0.8rem' }} className="text-decoration-none">
-                <i className="fas fa-shield-halved me-1" />
-                Admin? Login here
               </Link>
             </p>
           </form>
