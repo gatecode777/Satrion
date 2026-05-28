@@ -1,5 +1,5 @@
 import React from 'react';
-import connectDB from '@/lib/db';
+import connectDB, { ensureSeeded } from '@/lib/db';
 import Product from '@/models/Product';
 import Category from '@/models/Category';
 import HomeClient from '@/components/HomeClient';
@@ -18,22 +18,12 @@ export const metadata = {
   }
 };
 
-// Seed sample products if database is empty (mirroring api logic to ensure robustness)
-import { generateAllProducts } from '@/lib/sampleData';
-
-const sampleProducts = generateAllProducts();
-
 export default async function Home() {
-  await connectDB();
+  await ensureSeeded();
 
-  let products = await Product.find({}).sort({ createdAt: -1 });
-  let categories = await Category.find({});
+  const products = await Product.find({}).sort({ createdAt: -1 });
+  const categories = await Category.find({});
 
-  // Seed DB if completely empty
-  if (products.length === 0) {
-    await Product.insertMany(sampleProducts);
-    products = await Product.find({}).sort({ createdAt: -1 });
-  }
 
   // Format MongoDB documents for secure Next.js Server-Client serialization
   const serializedProducts = products.map((p) => {
