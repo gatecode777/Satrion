@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 
 const ContactClient = () => {
   useEffect(() => {
@@ -32,14 +33,14 @@ const ContactClient = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.email) {
-      alert('Please fill in all fields');
+      toast.error('Please fill in all fields');
       setLoading(false);
       return;
     }
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(formData.email)) {
-      alert('Please enter a valid email address');
+      toast.error('Please enter a valid email address');
       setLoading(false);
       return;
     }
@@ -57,7 +58,7 @@ const ContactClient = () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to send message');
 
-      alert('Message sent successfully!');
+      toast.success('Message sent successfully!');
       setFormData({
         name: '',
         email: '',
@@ -65,7 +66,7 @@ const ContactClient = () => {
         message: ''
       });
     } catch (error) {
-      alert(error.message);
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }

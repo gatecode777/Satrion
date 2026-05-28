@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useShop } from '../../context/ShopContext';
 import { toast } from 'react-toastify';
@@ -10,6 +10,40 @@ const Profile = () => {
   const { user, updateProfile, addAddress, updateAddress, deleteAddress, logoutUser, loading, requestReturn, requestExchange, changePassword, deleteAccount } = useShop();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('overview');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [profileImage, setProfileImage] = useState(null);
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && user?.email) {
+      const savedAvatar = localStorage.getItem(`satrion_avatar_${user.email}`);
+      if (savedAvatar) {
+        setProfileImage(savedAvatar);
+      } else {
+        setProfileImage(null);
+      }
+    }
+  }, [user]);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error('Image size must be less than 2MB');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64Url = event.target.result;
+        setProfileImage(base64Url);
+        if (typeof window !== 'undefined' && user?.email) {
+          localStorage.setItem(`satrion_avatar_${user.email}`, base64Url);
+        }
+        toast.success('Profile photo updated successfully!');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Return / Exchange states
   const [showReturnModal, setShowReturnModal] = useState(false);
@@ -246,103 +280,207 @@ const Profile = () => {
       <div className="container position-relative py-4" style={{ zIndex: 2 }}>
         <div className="row g-4">
           
-          {/* Left Navigation Sidebar */}
-          <div className="col-lg-4 col-xl-3 animate-fade-in-up">
-            <div className="card glass-premium p-4 text-white text-center h-100" style={{ borderRadius: '24px' }}>
-              
-              {/* User Avatar */}
+          {/* Collapsible Sidebar Drawer */}
+          <div 
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '320px',
+              height: '100vh',
+              backgroundColor: '#0f172af5',
+              backdropFilter: 'blur(16px)',
+              borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+              boxShadow: '20px 0 50px rgba(0, 0, 0, 0.5)',
+              transform: isSidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
+              transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+              zIndex: 1050,
+              padding: '30px 24px',
+              display: 'flex',
+              flexDirection: 'column',
+              overflowY: 'auto'
+            }}
+          >
+            {/* Close Button & Title */}
+            <div className="d-flex align-items-center justify-content-between mb-4">
+              <span className="fw-bold text-white small" style={{ letterSpacing: '1px', opacity: 0.6 }}>NAVIGATION MENU</span>
+              <button 
+                onClick={() => setIsSidebarOpen(false)}
+                className="btn btn-link text-white p-0 text-decoration-none"
+                style={{ fontSize: '1.5rem', lineHeight: 1 }}
+              >
+                &times;
+              </button>
+            </div>
+
+            {/* User Avatar */}
+            <div className="text-center mb-4">
               <div className="position-relative d-inline-block mx-auto mb-3">
-                <div className="d-flex align-items-center justify-content-center rounded-circle" style={{ 
-                  width: '90px', 
-                  height: '90px', 
-                  background: 'linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%)',
-                  boxShadow: '0 0 20px rgba(129, 140, 248, 0.4)'
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  onChange={handleFileChange} 
+                  accept="image/*" 
+                  style={{ display: 'none' }} 
+                />
+                <div className="d-flex align-items-center justify-content-center rounded-circle overflow-hidden" style={{ 
+                  width: '80px', 
+                  height: '80px', 
+                  background: profileImage ? 'transparent' : 'linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%)',
+                  boxShadow: '0 0 15px rgba(129, 140, 248, 0.3)',
+                  border: '2px solid rgba(255, 255, 255, 0.15)'
                 }}>
-                  <span className="fw-bold text-white" style={{ fontSize: '2.2rem' }}>
-                    {user.username ? user.username.charAt(0).toUpperCase() : 'U'}
-                  </span>
-                </div>
-                <span className="position-absolute bottom-0 end-0 bg-success border border-white rounded-circle" style={{ width: '15px', height: '15px' }}></span>
-              </div>
-
-              <h4 className="fw-bold mb-1">{user.username}</h4>
-              <p className="text-muted small mb-4">{user.email}</p>
-
-              <hr className="my-3" style={{ borderColor: 'rgba(255,255,255,0.1)' }} />
-
-              {/* Navigation Tabs */}
-              <div className="nav flex-column nav-pills gap-2 text-start" role="tablist">
-                <button 
-                  onClick={() => setActiveTab('overview')}
-                  className={`nav-link text-white text-start d-flex align-items-center py-3 px-4 border-0 rounded-3 transition ${activeTab === 'overview' ? 'bg-dark' : 'bg-transparent'}`}
-                  style={{ 
-                    background: activeTab === 'overview' ? 'rgba(255, 255, 255, 0.08) !important' : 'transparent',
-                    borderLeft: activeTab === 'overview' ? '4px solid #38bdf8' : '4px solid transparent',
-                    fontWeight: activeTab === 'overview' ? '600' : 'normal'
-                  }}
-                >
-                  <i className="fas fa-user-cog me-3 text-info"></i> Account Overview
-                </button>
-                
-                <button 
-                  onClick={() => setActiveTab('orders')}
-                  className={`nav-link text-white text-start d-flex align-items-center py-3 px-4 border-0 rounded-3 transition ${activeTab === 'orders' ? 'bg-dark' : 'bg-transparent'}`}
-                  style={{ 
-                    background: activeTab === 'orders' ? 'rgba(255, 255, 255, 0.08) !important' : 'transparent',
-                    borderLeft: activeTab === 'orders' ? '4px solid #818cf8' : '4px solid transparent',
-                    fontWeight: activeTab === 'orders' ? '600' : 'normal'
-                  }}
-                >
-                  <i className="fas fa-boxes me-3 text-warning"></i> My Orders 
-                  {user.orders?.length > 0 && (
-                    <span className="badge bg-secondary ms-auto small">{user.orders.length}</span>
+                  {profileImage ? (
+                    <img 
+                      src={profileImage} 
+                      alt="Profile Avatar" 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                    />
+                  ) : (
+                    <span className="fw-bold text-white" style={{ fontSize: '2rem' }}>
+                      {user.username ? user.username.charAt(0).toUpperCase() : 'U'}
+                    </span>
                   )}
-                </button>
+                </div>
                 
-                <button 
-                  onClick={() => setActiveTab('addresses')}
-                  className={`nav-link text-white text-start d-flex align-items-center py-3 px-4 border-0 rounded-3 transition ${activeTab === 'addresses' ? 'bg-dark' : 'bg-transparent'}`}
-                  style={{ 
-                    background: activeTab === 'addresses' ? 'rgba(255, 255, 255, 0.08) !important' : 'transparent',
-                    borderLeft: activeTab === 'addresses' ? '4px solid #c084fc' : '4px solid transparent',
-                    fontWeight: activeTab === 'addresses' ? '600' : 'normal'
+                {/* Green Active Status Indicator Dot */}
+                <span className="position-absolute bg-success border border-white rounded-circle" style={{ width: '13px', height: '13px', top: '4px', right: '4px' }}></span>
+                
+                {/* Floating Plus (+) Edit/Add Photo Button */}
+                <button
+                  onClick={() => fileInputRef.current.click()}
+                  className="position-absolute bg-info border border-white rounded-circle d-flex align-items-center justify-content-center hover-lift"
+                  style={{
+                    width: '28px',
+                    height: '28px',
+                    bottom: '-2px',
+                    right: '-2px',
+                    padding: 0,
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.35)',
+                    zIndex: 10,
+                    transition: 'all 0.2s'
                   }}
+                  title="Upload Profile Photo"
                 >
-                  <i className="fas fa-map-marker-alt me-3 text-danger"></i> Addresses
-                </button>
-
-                <button 
-                  onClick={() => setActiveTab('settings')}
-                  className={`nav-link text-white text-start d-flex align-items-center py-3 px-4 border-0 rounded-3 transition ${activeTab === 'settings' ? 'bg-dark' : 'bg-transparent'}`}
-                  style={{ 
-                    background: activeTab === 'settings' ? 'rgba(255, 255, 255, 0.08) !important' : 'transparent',
-                    borderLeft: activeTab === 'settings' ? '4px solid #06b6d4' : '4px solid transparent',
-                    fontWeight: activeTab === 'settings' ? '600' : 'normal'
-                  }}
-                >
-                  <i className="fas fa-cog me-3" style={{ color: '#06b6d4' }}></i> Settings
-                </button>
-
-                <button 
-                  onClick={handleLogout}
-                  className="nav-link text-danger text-start d-flex align-items-center py-3 px-4 border-0 bg-transparent rounded-3 mt-4"
-                >
-                  <i className="fas fa-sign-out-alt me-3"></i> Logout
+                  <i className="fas fa-plus text-dark" style={{ fontSize: '0.75rem' }}></i>
                 </button>
               </div>
+              <h4 className="fw-bold text-white mb-1" style={{ fontSize: '1.25rem' }}>{user.username}</h4>
+              <p className="text-muted small mb-0">{user.email}</p>
+            </div>
 
+            <hr className="my-3" style={{ borderColor: 'rgba(255,255,255,0.08)' }} />
+
+            {/* Navigation Tabs */}
+            <div className="nav flex-column nav-pills gap-2 text-start flex-grow-1" role="tablist">
+              <button 
+                onClick={() => { setActiveTab('overview'); setIsSidebarOpen(false); }}
+                className={`nav-link text-white text-start d-flex align-items-center py-3 px-4 border-0 rounded-3 transition ${activeTab === 'overview' ? 'bg-dark' : 'bg-transparent'}`}
+                style={{ 
+                  background: activeTab === 'overview' ? 'rgba(255, 255, 255, 0.08) !important' : 'transparent',
+                  borderLeft: activeTab === 'overview' ? '4px solid #38bdf8' : '4px solid transparent',
+                  fontWeight: activeTab === 'overview' ? '600' : 'normal'
+                }}
+              >
+                <i className="fas fa-user-cog me-3 text-info"></i> Account Overview
+              </button>
+              
+              <button 
+                onClick={() => { setActiveTab('orders'); setIsSidebarOpen(false); }}
+                className={`nav-link text-white text-start d-flex align-items-center py-3 px-4 border-0 rounded-3 transition ${activeTab === 'orders' ? 'bg-dark' : 'bg-transparent'}`}
+                style={{ 
+                  background: activeTab === 'orders' ? 'rgba(255, 255, 255, 0.08) !important' : 'transparent',
+                  borderLeft: activeTab === 'orders' ? '4px solid #818cf8' : '4px solid transparent',
+                  fontWeight: activeTab === 'orders' ? '600' : 'normal'
+                }}
+              >
+                <i className="fas fa-boxes me-3 text-warning"></i> My Orders 
+                {user.orders?.length > 0 && (
+                  <span className="badge bg-secondary ms-auto small">{user.orders.length}</span>
+                )}
+              </button>
+              
+              <button 
+                onClick={() => { setActiveTab('addresses'); setIsSidebarOpen(false); }}
+                className={`nav-link text-white text-start d-flex align-items-center py-3 px-4 border-0 rounded-3 transition ${activeTab === 'addresses' ? 'bg-dark' : 'bg-transparent'}`}
+                style={{ 
+                  background: activeTab === 'addresses' ? 'rgba(255, 255, 255, 0.08) !important' : 'transparent',
+                  borderLeft: activeTab === 'addresses' ? '4px solid #c084fc' : '4px solid transparent',
+                  fontWeight: activeTab === 'addresses' ? '600' : 'normal'
+                }}
+              >
+                <i className="fas fa-map-marker-alt me-3 text-danger"></i> Addresses
+              </button>
+
+              <button 
+                onClick={() => { setActiveTab('settings'); setIsSidebarOpen(false); }}
+                className={`nav-link text-white text-start d-flex align-items-center py-3 px-4 border-0 rounded-3 transition ${activeTab === 'settings' ? 'bg-dark' : 'bg-transparent'}`}
+                style={{ 
+                  background: activeTab === 'settings' ? 'rgba(255, 255, 255, 0.08) !important' : 'transparent',
+                  borderLeft: activeTab === 'settings' ? '4px solid #06b6d4' : '4px solid transparent',
+                  fontWeight: activeTab === 'settings' ? '600' : 'normal'
+                }}
+              >
+                <i className="fas fa-cog me-3" style={{ color: '#06b6d4' }}></i> Settings
+              </button>
+
+              <button 
+                onClick={() => { handleLogout(); setIsSidebarOpen(false); }}
+                className="nav-link text-danger text-start d-flex align-items-center py-3 px-4 border-0 bg-transparent rounded-3 mt-4"
+              >
+                <i className="fas fa-sign-out-alt me-3"></i> Logout
+              </button>
             </div>
           </div>
 
+          {/* Backdrop overlay */}
+          {isSidebarOpen && (
+            <div 
+              onClick={() => setIsSidebarOpen(false)}
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100vw',
+                height: '100vh',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                backdropFilter: 'blur(4px)',
+                zIndex: 1040,
+                animation: 'fadeIn 0.2s ease-in'
+              }}
+            />
+          )}
+
           {/* Right Main Content Panel */}
-          <div className="col-lg-8 col-xl-9 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+          <div className="col-12 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
             <div className="card glass-premium p-4 p-md-5 text-white h-100" style={{ borderRadius: '24px' }}>
               
               {/* Tab 1: Account Overview */}
               {activeTab === 'overview' && (
                 <div>
-                  <h3 className="fw-bold mb-2">Account Overview</h3>
-                  <p className="text-muted small mb-4">View and update your profile details below</p>
+                  <div className="d-flex align-items-center gap-3 mb-4">
+                    <button 
+                      onClick={() => setIsSidebarOpen(true)}
+                      className="btn btn-outline-light d-flex align-items-center justify-content-center p-0"
+                      style={{
+                        backgroundColor: 'rgba(255,255,255,0.04)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        width: '42px',
+                        height: '42px',
+                        borderRadius: '12px',
+                        transition: 'all 0.2s',
+                        color: '#38bdf8'
+                      }}
+                      title="Open Navigation"
+                    >
+                      <i className="fas fa-bars" style={{ fontSize: '1.1rem' }}></i>
+                    </button>
+                    <div>
+                      <h3 className="fw-bold mb-0">Account Overview</h3>
+                      <p className="text-muted small mb-0">View and update your profile details below</p>
+                    </div>
+                  </div>
                   
                   <form onSubmit={handleProfileSubmit}>
                     <div className="row g-4">
@@ -408,8 +546,28 @@ const Profile = () => {
               {/* Tab 2: Orders List */}
               {activeTab === 'orders' && (
                 <div>
-                  <h3 className="fw-bold mb-2">My Orders</h3>
-                  <p className="text-muted small mb-4">Track the details and fulfillment status of your mock orders</p>
+                  <div className="d-flex align-items-center gap-3 mb-4">
+                    <button 
+                      onClick={() => setIsSidebarOpen(true)}
+                      className="btn btn-outline-light d-flex align-items-center justify-content-center p-0"
+                      style={{
+                        backgroundColor: 'rgba(255,255,255,0.04)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        width: '42px',
+                        height: '42px',
+                        borderRadius: '12px',
+                        transition: 'all 0.2s',
+                        color: '#818cf8'
+                      }}
+                      title="Open Navigation"
+                    >
+                      <i className="fas fa-bars" style={{ fontSize: '1.1rem' }}></i>
+                    </button>
+                    <div>
+                      <h3 className="fw-bold mb-0">My Orders</h3>
+                      <p className="text-muted small mb-0">Track the details and fulfillment status of your mock orders</p>
+                    </div>
+                  </div>
 
                   {!user.orders || user.orders.length === 0 ? (
                     <div className="text-center py-5 rounded-4" style={{ backgroundColor: 'rgba(255, 255, 255, 0.02)', border: '1px dotted rgba(255,255,255,0.1)' }}>
@@ -574,10 +732,28 @@ const Profile = () => {
               {/* Tab 3: Address Management */}
               {activeTab === 'addresses' && (
                 <div>
-                  <div className="d-flex justify-content-between align-items-center mb-4">
-                    <div>
-                      <h3 className="fw-bold mb-2">My Addresses</h3>
-                      <p className="text-muted small mb-0">Manage your saved shipping and billing coordinates</p>
+                  <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap g-3">
+                    <div className="d-flex align-items-center gap-3">
+                      <button 
+                        onClick={() => setIsSidebarOpen(true)}
+                        className="btn btn-outline-light d-flex align-items-center justify-content-center p-0"
+                        style={{
+                          backgroundColor: 'rgba(255,255,255,0.04)',
+                          border: '1px solid rgba(255,255,255,0.08)',
+                          width: '42px',
+                          height: '42px',
+                          borderRadius: '12px',
+                          transition: 'all 0.2s',
+                          color: '#c084fc'
+                        }}
+                        title="Open Navigation"
+                      >
+                        <i className="fas fa-bars" style={{ fontSize: '1.1rem' }}></i>
+                      </button>
+                      <div>
+                        <h3 className="fw-bold mb-0">My Addresses</h3>
+                        <p className="text-muted small mb-0">Manage your saved shipping and billing coordinates</p>
+                      </div>
                     </div>
                     <button 
                       onClick={() => {
@@ -639,8 +815,28 @@ const Profile = () => {
               {/* Tab 4: Settings */}
               {activeTab === 'settings' && (
                 <div>
-                  <h3 className="fw-bold mb-2">Account Settings</h3>
-                  <p className="text-muted small mb-4">Manage your password settings and account status</p>
+                  <div className="d-flex align-items-center gap-3 mb-4">
+                    <button 
+                      onClick={() => setIsSidebarOpen(true)}
+                      className="btn btn-outline-light d-flex align-items-center justify-content-center p-0"
+                      style={{
+                        backgroundColor: 'rgba(255,255,255,0.04)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        width: '42px',
+                        height: '42px',
+                        borderRadius: '12px',
+                        transition: 'all 0.2s',
+                        color: '#06b6d4'
+                      }}
+                      title="Open Navigation"
+                    >
+                      <i className="fas fa-bars" style={{ fontSize: '1.1rem' }}></i>
+                    </button>
+                    <div>
+                      <h3 className="fw-bold mb-0">Account Settings</h3>
+                      <p className="text-muted small mb-0">Manage your password settings and account status</p>
+                    </div>
+                  </div>
                   
                   {/* Change Password Section */}
                   <form onSubmit={handlePasswordSubmit} className="mb-5">

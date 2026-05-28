@@ -60,7 +60,7 @@ export default function RootLayout({ children }) {
           <ClientLayoutWrapper>
             {children}
           </ClientLayoutWrapper>
-          <ToastContainer position="top-right" autoClose={1500} hideProgressBar={true} theme="dark" />
+          <ToastContainer position="top-right" autoClose={1500} hideProgressBar={true} theme="dark" style={{ zIndex: 999999 }} />
         </ShopProvider>
 
         {/* Load Client Scripts — deferred, non-blocking */}
