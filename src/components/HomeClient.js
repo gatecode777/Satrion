@@ -63,8 +63,8 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
     const gaming = initialProducts.filter(p => p.homepageSection === 'Our Range of Gaming Products' && p.isActive !== false).slice(0, 9);
     setGamingProducts(gaming);
 
-    // Client-side Hydration: Fetch full products asynchronously to populate base64 images
-    fetch('/api/products')
+    // Client-side Hydration: Fetch full products asynchronously to populate base64 images without caching
+    fetch('/api/products', { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
