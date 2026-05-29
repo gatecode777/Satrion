@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import connectDB from '@/lib/db';
 import User from '@/models/User';
 import Product from '@/models/Product';
+import Category from '@/models/Category';
 
 async function protectAdmin(req) {
   await connectDB();
@@ -25,9 +26,15 @@ export async function GET(req) {
     const search = searchParams.get('search') || '';
     const category = searchParams.get('category') || '';
 
+    // Fetch registered active categories first to restrict products query dynamically
+    const categories = await Category.find({ isActive: { $ne: false } }).lean();
+    const categoryNames = categories.map(c => c.name);
+
     let query = {};
     if (category) {
       query.category = category;
+    } else {
+      query.category = { $in: categoryNames };
     }
     if (search) {
       query.name = { $regex: search, $options: 'i' };

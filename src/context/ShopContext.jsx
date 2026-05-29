@@ -13,20 +13,23 @@ export const ShopProvider = ({ children }) => {
   const [wishlist, setWishlist] = useState([]);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isTokenChecked, setIsTokenChecked] = useState(false);
 
   // Sync token to LocalStorage in browser environment
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedToken = localStorage.getItem('satrion_token');
-      if (savedToken) {
-        setToken(savedToken);
-      } else {
-        setLoading(false);
-      }
+      setTimeout(() => {
+        if (savedToken) {
+          setToken(savedToken);
+        }
+        setIsTokenChecked(true);
+      }, 0);
     }
   }, []);
 
   useEffect(() => {
+    if (!isTokenChecked) return;
     if (typeof window !== 'undefined') {
       if (token) {
         localStorage.setItem('satrion_token', token);
@@ -34,10 +37,12 @@ export const ShopProvider = ({ children }) => {
         localStorage.removeItem('satrion_token');
       }
     }
-  }, [token]);
+  }, [token, isTokenChecked]);
 
   // Load profile and orders in parallel when token is present
   useEffect(() => {
+    if (!isTokenChecked) return;
+
     const loadUserData = async () => {
       if (!token) {
         setUser(null);
@@ -99,7 +104,7 @@ export const ShopProvider = ({ children }) => {
     };
 
     loadUserData();
-  }, [token]);
+  }, [token, isTokenChecked]);
 
   // Cart actions
   const addToCart = async (product, quantity = 1) => {
@@ -655,6 +660,7 @@ export const ShopProvider = ({ children }) => {
         loginUser,
         signupUser,
         logoutUser,
+        logout: logoutUser,
         updateProfile,
         changePassword,
         deleteAccount,

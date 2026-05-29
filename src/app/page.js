@@ -23,14 +23,18 @@ export const metadata = {
 export default async function Home() {
   await ensureSeeded();
 
+  // Fetch registered active categories first
+  const categories = await Category.find({ isActive: { $ne: false } }).lean();
+  const categoryNames = categories.map(c => c.name);
+
+  // Fetch only products belonging to the active categories
   const products = await Product.find({
     homepageSection: { 
       $in: ['Featured Products', 'Bestsellers', 'Our Range of Gaming Products'] 
     },
-    isActive: { $ne: false }
+    isActive: { $ne: false },
+    category: { $in: categoryNames }
   }).sort({ createdAt: -1 }).lean();
-  const categories = await Category.find({}).lean();
-
 
   // Format MongoDB documents for secure Next.js Server-Client serialization
   const serializedProducts = products.map((p) => {

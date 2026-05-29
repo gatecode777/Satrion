@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     await ensureSeeded();
-    const categories = await Category.find({ isActive: true })
+    const categories = await Category.find({ isActive: { $ne: false } })
       .select('name slug image')
       .sort({ name: 1 })
       .lean();

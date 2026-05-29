@@ -26,6 +26,8 @@ const ProductSchema = new mongoose.Schema({
 // Index so Atlas can sort by createdAt without exceeding the 32MB in-memory sort limit
 ProductSchema.index({ createdAt: -1 });
 ProductSchema.index({ isActive: 1, createdAt: -1 });
+ProductSchema.index({ category: 1 });
+ProductSchema.index({ homepageSection: 1 });
 
 const Product = mongoose.models.Product || mongoose.model('Product', ProductSchema);
 

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB, { ensureSeeded } from '@/lib/db';
 import Product from '@/models/Product';
+import Category from '@/models/Category';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,10 +12,17 @@ export async function GET(req) {
     const category = searchParams.get('category') || '';
     const featuredOnly = searchParams.get('featured') === 'true';
 
-    let query = {};
+    // 1. Fetch registered active categories first to restrict products query dynamically
+    const categories = await Category.find({ isActive: { $ne: false } }).lean();
+    const categoryNames = categories.map(c => c.name);
+
+    let query = { isActive: { $ne: false } };
     if (category && category !== 'All') {
       query.category = category;
+    } else {
+      query.category = { $in: categoryNames };
     }
+
     if (featuredOnly) {
       query.isFeatured = true;
     }

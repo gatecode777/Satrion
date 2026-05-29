@@ -48,12 +48,18 @@ export default async function ShopPage({ searchParams }) {
 
   const itemsPerPage = 9;
 
+  // 1. Fetch registered active categories first to restrict products query dynamically
+  const categories = await Category.find({ isActive: { $ne: false } }).lean();
+  const categoryNames = categories.map(c => c.name);
+
   // Build MongoDB query
   const dbQuery = { isActive: { $ne: false } };
 
-  // Category filter
+  // Category filter: Restrict to registered active categories
   if (category !== 'All') {
     dbQuery.category = category;
+  } else {
+    dbQuery.category = { $in: categoryNames };
   }
 
   // Price filter
@@ -84,28 +90,40 @@ export default async function ShopPage({ searchParams }) {
     sortOption = { createdAt: -1 };
   }
 
-  // Fetch paginated products and total count
-  const products = await Product.find(dbQuery)
-    .sort(sortOption)
-    .skip((page - 1) * itemsPerPage)
-    .limit(itemsPerPage)
-    .lean();
+  // Build aggregation match filter (matching active search and price range, excluding category itself to show global counts for filters)
+  // Restrict count match filter to registered active categories
+  const countMatchFilter = { 
+    isActive: { $ne: false },
+    category: { $in: categoryNames }
+  };
+  countMatchFilter.price = { $gte: minPrice, $lte: maxPrice };
+  if (query) {
+    countMatchFilter.$or = [
+      { name: { $regex: query, $options: 'i' } },
+      { description: { $regex: query, $options: 'i' } },
+      { category: { $regex: query, $options: 'i' } }
+    ];
+  }
 
-  const totalItems = await Product.countDocuments(dbQuery);
-  const categories = await Category.find({}).lean();
-
-  // Fetch product counts per category (using server-side aggregation for speed)
-  const categoryCounts = await Product.aggregate([
-    { $match: { isActive: { $ne: false } } },
-    { $group: { _id: '$category', count: { $sum: 1 } } }
+  // Fetch paginated products, counts, and aggregations in parallel to minimize latency
+  const [products, totalItems, categoryCounts, totalProductsCount] = await Promise.all([
+    Product.find(dbQuery)
+      .sort(sortOption)
+      .skip((page - 1) * itemsPerPage)
+      .limit(itemsPerPage)
+      .lean(),
+    Product.countDocuments(dbQuery),
+    Product.aggregate([
+      { $match: countMatchFilter },
+      { $group: { _id: '$category', count: { $sum: 1 } } }
+    ]),
+    Product.countDocuments(countMatchFilter)
   ]);
 
   const countsMap = {};
   categoryCounts.forEach(c => {
     if (c._id) countsMap[c._id] = c.count;
   });
-
-  const totalProductsCount = await Product.countDocuments({ isActive: { $ne: false } });
 
   // Format MongoDB documents for secure Next.js Server-Client serialization
   const serializedProducts = products.map((p) => {
