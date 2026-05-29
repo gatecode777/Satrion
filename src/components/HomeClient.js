@@ -53,7 +53,7 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
       });
     }
 
-    // First render: Filter products locally (text content is SSR'ed immediately)
+    // Set products directly from the server-rendered initialProducts (no client-side API requests or caching required)
     const featured = initialProducts.filter(p => p.homepageSection === 'Featured Products' && p.isActive !== false).slice(0, 9);
     setFeaturedProducts(featured);
 
@@ -62,22 +62,6 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
 
     const gaming = initialProducts.filter(p => p.homepageSection === 'Our Range of Gaming Products' && p.isActive !== false).slice(0, 9);
     setGamingProducts(gaming);
-
-    // Client-side Hydration: Fetch full products asynchronously to populate base64 images without caching
-    fetch('/api/products', { cache: 'no-store' })
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          const normalized = data.map(p => ({
-            ...p,
-            id: p._id ? p._id.toString() : p.id
-          }));
-          setFeaturedProducts(normalized.filter(p => p.homepageSection === 'Featured Products' && p.isActive !== false).slice(0, 9));
-          setBestsellerProducts(normalized.filter(p => p.homepageSection === 'Bestsellers' && p.isActive !== false).slice(0, 9));
-          setGamingProducts(normalized.filter(p => p.homepageSection === 'Our Range of Gaming Products' && p.isActive !== false).slice(0, 9));
-        }
-      })
-      .catch(err => console.error('Error fetching images on client:', err));
   }, [initialProducts]);
 
   const renderStars = (rating = 5) => {
