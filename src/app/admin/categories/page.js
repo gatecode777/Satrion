@@ -5,6 +5,54 @@ import { useShop } from '../../../context/ShopContext';
 import { toast } from 'react-toastify';
 import Portal from '../../../components/Portal';
 
+// Client-side high-performance image compression using HTML5 Canvas
+const compressImage = (file) => {
+  return new Promise((resolve) => {
+    if (file.type === 'image/gif' || file.type === 'image/svg+xml') {
+      resolve(file);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 800; // Resize to a high-density web-friendly width
+        let width = img.width;
+        let height = img.height;
+
+        if (width > MAX_WIDTH) {
+          height = Math.round((height * MAX_WIDTH) / width);
+          width = MAX_WIDTH;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const compressedFile = new File([blob], file.name, {
+              type: 'image/jpeg',
+              lastModified: Date.now()
+            });
+            resolve(compressedFile);
+          } else {
+            resolve(file);
+          }
+        }, 'image/jpeg', 0.7); // 0.7 quality is extremely lightweight and fast to fetch
+      };
+      img.onerror = () => resolve(file);
+    };
+    reader.onerror = () => resolve(file);
+  });
+};
+
 // ── Reusable image upload component ──────────────────────────────────────────
 function ImageUploader({ value, onChange, token, placeholder = 'Click or drag to upload image' }) {
   const inputRef = useRef(null);
@@ -15,8 +63,9 @@ function ImageUploader({ value, onChange, token, placeholder = 'Click or drag to
     if (!file) return;
     setUploading(true);
     try {
+      const compressed = await compressImage(file);
       const fd = new FormData();
-      fd.append('file', file);
+      fd.append('file', compressed);
       const res = await fetch('/api/upload', { method: 'POST', body: fd });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Upload failed');
