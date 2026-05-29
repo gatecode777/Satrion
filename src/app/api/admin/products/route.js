@@ -26,8 +26,8 @@ export async function GET(req) {
     const search = searchParams.get('search') || '';
     const category = searchParams.get('category') || '';
 
-    // Fetch registered active categories first to restrict products query dynamically
-    const categories = await Category.find({ isActive: { $ne: false } }).lean();
+    // Fetch categories and build query
+    const categories = await Category.find({ isActive: { $ne: false } }).select('name').lean();
     const categoryNames = categories.map(c => c.name);
 
     let query = {};
@@ -40,11 +40,16 @@ export async function GET(req) {
       query.name = { $regex: search, $options: 'i' };
     }
 
-    const total = await Product.countDocuments(query);
-    const products = await Product.find(query)
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit);
+    // Parallel queries: count + paginated products (NO image field — base64 blobs are huge)
+    const [total, products] = await Promise.all([
+      Product.countDocuments(query),
+      Product.find(query)
+        .select('-image')
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean()
+    ]);
 
     return NextResponse.json({ products, total, page, pages: Math.ceil(total / limit) });
   } catch (err) {

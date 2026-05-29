@@ -15,7 +15,22 @@ async function protectAdmin(req) {
   return user;
 }
 
-// PATCH /api/admin/products/[id] - Update a product
+// GET /api/admin/products/[id] - Fetch a single product by ID (including image for edit form)
+export async function GET(req, { params }) {
+  try {
+    await protectAdmin(req);
+    const { id } = await params;
+    const product = await Product.findById(id).lean();
+    if (!product) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+    }
+    return NextResponse.json({ product });
+  } catch (err) {
+    return NextResponse.json({ error: err.message }, { status: 401 });
+  }
+}
+
+
 export async function PATCH(req, { params }) {
   try {
     await protectAdmin(req);
