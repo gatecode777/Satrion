@@ -48,36 +48,7 @@ export default async function ShopPage({ searchParams }) {
 
   const itemsPerPage = 9;
 
-  // 1. Fetch registered active categories first to restrict products query dynamically
-  const categories = await Category.find({ isActive: { $ne: false } }).lean();
-  const categoryNames = categories.map(c => c.name);
-
-  // Build MongoDB query
-  const dbQuery = { isActive: { $ne: false } };
-
-  // Category filter: Restrict to registered active categories
-  if (category !== 'All') {
-    dbQuery.category = category;
-  } else {
-    dbQuery.category = { $in: categoryNames };
-  }
-
-  // Price filter
-  dbQuery.price = {
-    $gte: minPrice,
-    $lte: maxPrice
-  };
-
-  // Search filter
-  if (query) {
-    dbQuery.$or = [
-      { name: { $regex: query, $options: 'i' } },
-      { description: { $regex: query, $options: 'i' } },
-      { category: { $regex: query, $options: 'i' } }
-    ];
-  }
-
-  // Define sort option
+  // Define sort option for the indexed query
   let sortOption = {};
   if (sort === 'A to Z') {
     sortOption = { name: 1 };
@@ -90,40 +61,47 @@ export default async function ShopPage({ searchParams }) {
     sortOption = { createdAt: -1 };
   }
 
-  // Build aggregation match filter (matching active search and price range, excluding category itself to show global counts for filters)
-  // Restrict count match filter to registered active categories
-  const countMatchFilter = { 
-    isActive: { $ne: false },
-    category: { $in: categoryNames }
-  };
-  countMatchFilter.price = { $gte: minPrice, $lte: maxPrice };
-  if (query) {
-    countMatchFilter.$or = [
-      { name: { $regex: query, $options: 'i' } },
-      { description: { $regex: query, $options: 'i' } },
-      { category: { $regex: query, $options: 'i' } }
-    ];
-  }
-
-  // Fetch paginated products, counts, and aggregations in parallel to minimize latency
-  const [products, totalItems, categoryCounts, totalProductsCount] = await Promise.all([
-    Product.find(dbQuery)
-      .sort(sortOption)
-      .skip((page - 1) * itemsPerPage)
-      .limit(itemsPerPage)
-      .lean(),
-    Product.countDocuments(dbQuery),
-    Product.aggregate([
-      { $match: countMatchFilter },
-      { $group: { _id: '$category', count: { $sum: 1 } } }
-    ]),
-    Product.countDocuments(countMatchFilter)
+  // Fetch only categories and active products in parallel to optimize redirection speed
+  const [categories, allActiveProducts] = await Promise.all([
+    Category.find({ isActive: { $ne: false } }).lean(),
+    Product.find({ isActive: { $ne: false } }).sort(sortOption).lean()
   ]);
 
+  const categoryNames = categories.map(c => c.name);
+
+  // 1. Filter by active category names in memory
+  let filtered = allActiveProducts.filter(p => categoryNames.includes(p.category));
+
+  // 2. Search filter in memory
+  if (query) {
+    const qLower = query.toLowerCase();
+    filtered = filtered.filter(p => 
+      (p.name && p.name.toLowerCase().includes(qLower)) || 
+      (p.description && p.description.toLowerCase().includes(qLower)) || 
+      (p.category && p.category.toLowerCase().includes(qLower))
+    );
+  }
+
+  // 3. Price filter in memory
+  filtered = filtered.filter(p => p.price >= minPrice && p.price <= maxPrice);
+
+  // 4. Compute dynamic sidebar category counts based on search and price filters
   const countsMap = {};
-  categoryCounts.forEach(c => {
-    if (c._id) countsMap[c._id] = c.count;
+  filtered.forEach(p => {
+    countsMap[p.category] = (countsMap[p.category] || 0) + 1;
   });
+
+  const totalProductsCount = filtered.length;
+
+  // 5. Apply Category filter in memory
+  if (category !== 'All') {
+    filtered = filtered.filter(p => p.category === category);
+  }
+
+  const totalItems = filtered.length;
+
+  // 6. Paginate products in memory
+  const products = filtered.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
   // Format MongoDB documents for secure Next.js Server-Client serialization
   const serializedProducts = products.map((p) => {
