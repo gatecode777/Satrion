@@ -1,16 +1,6 @@
 import mongoose from 'mongoose';
-import fs from 'node:fs/promises';
-import path from 'node:path';
 import Product from '../models/Product';
 import Category from '../models/Category';
-
-// Custom DNS configuration removed to prevent SRV lookup failures on restricted networks
-
-const MONGODB_URI = process.env.MONGODB_URI;
-
-if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
-}
 
 let cached = global.mongoose;
 
@@ -19,6 +9,12 @@ if (!cached) {
 }
 
 async function connectDB() {
+  // Lazy check: only throw at runtime (when actually connecting), not during build
+  const MONGODB_URI = process.env.MONGODB_URI;
+  if (!MONGODB_URI) {
+    throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
+  }
+
   if (cached.conn) {
     return cached.conn;
   }
@@ -59,7 +55,7 @@ if (!global.dbCache) {
 }
 
 export async function getCachedData() {
-  const CACHE_TTL = 15 * 1000; // 15 seconds Cache TTL to balance real-time sync with supersonic speed
+  const CACHE_TTL = 15 * 1000; // 15 seconds TTL
   const now = Date.now();
   const cache = global.dbCache;
 
@@ -98,4 +94,3 @@ export async function ensureSeeded() {
 }
 
 export default connectDB;
-
