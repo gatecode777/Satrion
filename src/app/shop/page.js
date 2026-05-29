@@ -99,12 +99,22 @@ export default async function ShopPage({ searchParams }) {
   // 8. Paginate products in memory
   const products = filtered.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
+  // 9. Fetch the images only for the 9 paginated products on the current page to bypass database network lag
+  const paginatedIds = products.map(p => p._id);
+  const imagesData = await Product.find({ _id: { $in: paginatedIds } }).select('image').lean();
+  
+  const imagesMap = {};
+  imagesData.forEach(img => {
+    imagesMap[img._id.toString()] = img.image;
+  });
+
   // Format MongoDB documents for secure Next.js Server-Client serialization
   const serializedProducts = products.map((p) => {
     return {
       ...p,
       id: p._id ? p._id.toString() : '',
       _id: p._id ? p._id.toString() : '',
+      image: imagesMap[p._id.toString()] || '', // Map the fetched image back
       createdAt: p.createdAt ? (p.createdAt instanceof Date ? p.createdAt.toISOString() : p.createdAt) : null,
       updatedAt: p.updatedAt ? (p.updatedAt instanceof Date ? p.updatedAt.toISOString() : p.updatedAt) : null,
     };

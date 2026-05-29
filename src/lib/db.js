@@ -71,7 +71,7 @@ export async function getCachedData() {
 
   const [categories, products] = await Promise.all([
     Category.find({ isActive: { $ne: false } }).lean(),
-    Product.find({ isActive: { $ne: false } }).lean()
+    Product.find({ isActive: { $ne: false } }).select('-image').lean()
   ]);
 
   cache.categories = categories;
