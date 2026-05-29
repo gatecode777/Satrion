@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import connectDB, { ensureSeeded } from '@/lib/db';
+import connectDB, { ensureSeeded, getCachedData } from '@/lib/db';
 import Product from '@/models/Product';
 import Category from '@/models/Category';
 import ShopClient from '@/components/ShopClient';
@@ -48,31 +48,15 @@ export default async function ShopPage({ searchParams }) {
 
   const itemsPerPage = 9;
 
-  // Define sort option for the indexed query
-  let sortOption = {};
-  if (sort === 'A to Z') {
-    sortOption = { name: 1 };
-  } else if (sort === 'Price: Low to High') {
-    sortOption = { price: 1 };
-  } else if (sort === 'Price: High to Low') {
-    sortOption = { price: -1 };
-  } else {
-    // Featured / default
-    sortOption = { createdAt: -1 };
-  }
-
-  // Fetch only categories and active products in parallel to optimize redirection speed
-  const [categories, allActiveProducts] = await Promise.all([
-    Category.find({ isActive: { $ne: false } }).lean(),
-    Product.find({ isActive: { $ne: false } }).sort(sortOption).lean()
-  ]);
+  // 1. Fetch only categories and active products from memory cache (0ms DB network round trips!)
+  const { categories, products: allActiveProducts } = await getCachedData();
 
   const categoryNames = categories.map(c => c.name);
 
-  // 1. Filter by active category names in memory
+  // 2. Filter by active category names in memory
   let filtered = allActiveProducts.filter(p => categoryNames.includes(p.category));
 
-  // 2. Search filter in memory
+  // 3. Search filter in memory
   if (query) {
     const qLower = query.toLowerCase();
     filtered = filtered.filter(p => 
@@ -82,10 +66,10 @@ export default async function ShopPage({ searchParams }) {
     );
   }
 
-  // 3. Price filter in memory
+  // 4. Price filter in memory
   filtered = filtered.filter(p => p.price >= minPrice && p.price <= maxPrice);
 
-  // 4. Compute dynamic sidebar category counts based on search and price filters
+  // 5. Compute dynamic sidebar category counts based on search and price filters
   const countsMap = {};
   filtered.forEach(p => {
     countsMap[p.category] = (countsMap[p.category] || 0) + 1;
@@ -93,14 +77,26 @@ export default async function ShopPage({ searchParams }) {
 
   const totalProductsCount = filtered.length;
 
-  // 5. Apply Category filter in memory
+  // 6. Apply Category filter in memory
   if (category !== 'All') {
     filtered = filtered.filter(p => p.category === category);
   }
 
   const totalItems = filtered.length;
 
-  // 6. Paginate products in memory
+  // 7. Sort products in memory
+  if (sort === 'A to Z') {
+    filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  } else if (sort === 'Price: Low to High') {
+    filtered.sort((a, b) => a.price - b.price);
+  } else if (sort === 'Price: High to Low') {
+    filtered.sort((a, b) => b.price - a.price);
+  } else {
+    // Featured / default: sort by createdAt descending
+    filtered.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+  }
+
+  // 8. Paginate products in memory
   const products = filtered.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
   // Format MongoDB documents for secure Next.js Server-Client serialization
@@ -109,8 +105,8 @@ export default async function ShopPage({ searchParams }) {
       ...p,
       id: p._id ? p._id.toString() : '',
       _id: p._id ? p._id.toString() : '',
-      createdAt: p.createdAt ? p.createdAt.toISOString() : null,
-      updatedAt: p.updatedAt ? p.updatedAt.toISOString() : null,
+      createdAt: p.createdAt ? (p.createdAt instanceof Date ? p.createdAt.toISOString() : p.createdAt) : null,
+      updatedAt: p.updatedAt ? (p.updatedAt instanceof Date ? p.updatedAt.toISOString() : p.updatedAt) : null,
     };
   });
 

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import connectDB from '@/lib/db';
+import connectDB, { invalidateCache } from '@/lib/db';
 import User from '@/models/User';
 import Category from '@/models/Category';
 
@@ -27,6 +27,10 @@ export async function PATCH(req, { params }) {
       { returnDocument: 'after' }
     );
     if (!category) return NextResponse.json({ error: 'Category not found' }, { status: 404 });
+
+    // Invalidate the cache to show category edits instantly in real time
+    invalidateCache();
+
     return NextResponse.json({ category });
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
@@ -41,6 +45,10 @@ export async function DELETE(req, { params }) {
     const { id } = await params;
     const category = await Category.findByIdAndDelete(id);
     if (!category) return NextResponse.json({ error: 'Category not found' }, { status: 404 });
+
+    // Invalidate the cache to show category deletions instantly in real time
+    invalidateCache();
+
     return NextResponse.json({ message: 'Category deleted' });
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });

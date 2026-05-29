@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import connectDB from '@/lib/db';
+import connectDB, { invalidateCache } from '@/lib/db';
 import User from '@/models/User';
 import Product from '@/models/Product';
 
@@ -40,6 +40,9 @@ export async function PATCH(req, { params }) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
 
+    // Invalidate the cache to show edits instantly in real time
+    invalidateCache();
+
     return NextResponse.json({ product });
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 401 });
@@ -55,6 +58,10 @@ export async function DELETE(req, { params }) {
     if (!product) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
+
+    // Invalidate the cache to show deletions instantly in real time
+    invalidateCache();
+
     return NextResponse.json({ message: 'Product deleted successfully' });
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 401 });

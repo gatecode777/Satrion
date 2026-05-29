@@ -49,6 +49,46 @@ export async function migrateBase64Images() {
   // Instead, the application now saves highly-compressed, lightweight Base64 strings in the database.
 }
 
+// Global memory cache to bypass slow regional database network round trips
+if (!global.dbCache) {
+  global.dbCache = {
+    categories: null,
+    products: null,
+    lastFetched: 0
+  };
+}
+
+export async function getCachedData() {
+  const CACHE_TTL = 15 * 1000; // 15 seconds Cache TTL to balance real-time sync with supersonic speed
+  const now = Date.now();
+  const cache = global.dbCache;
+
+  if (cache.categories && cache.products && (now - cache.lastFetched < CACHE_TTL)) {
+    return { categories: cache.categories, products: cache.products };
+  }
+
+  await connectDB();
+
+  const [categories, products] = await Promise.all([
+    Category.find({ isActive: { $ne: false } }).lean(),
+    Product.find({ isActive: { $ne: false } }).lean()
+  ]);
+
+  cache.categories = categories;
+  cache.products = products;
+  cache.lastFetched = now;
+
+  return { categories, products };
+}
+
+export function invalidateCache() {
+  if (global.dbCache) {
+    global.dbCache.categories = null;
+    global.dbCache.products = null;
+    global.dbCache.lastFetched = 0;
+  }
+}
+
 export async function ensureSeeded() {
   try {
     await connectDB();

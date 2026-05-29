@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import connectDB from '@/lib/db';
+import connectDB, { invalidateCache } from '@/lib/db';
 import User from '@/models/User';
 import Category from '@/models/Category';
 
@@ -45,6 +45,10 @@ export async function POST(req) {
     }
 
     const category = await Category.create({ name, slug, image: image || '', description: description || '' });
+
+    // Invalidate global DB cache
+    invalidateCache();
+
     return NextResponse.json({ category }, { status: 201 });
   } catch (err) {
     console.error('Category Create Error:', err);

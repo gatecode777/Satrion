@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import connectDB from '@/lib/db';
+import connectDB, { invalidateCache } from '@/lib/db';
 import User from '@/models/User';
 import Product from '@/models/Product';
 import Category from '@/models/Category';
@@ -75,6 +75,9 @@ export async function POST(req) {
       homepageSection: homepageSection || 'None',
       isFeatured: homepageSection === 'Featured Products'
     });
+
+    // Invalidate the cache to show new products instantly in real time
+    invalidateCache();
 
     return NextResponse.json({ product }, { status: 201 });
   } catch (err) {
