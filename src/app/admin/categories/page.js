@@ -20,7 +20,7 @@ const compressImage = (file) => {
       img.src = event.target.result;
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 800; // Resize to a high-density web-friendly width
+        const MAX_WIDTH = 500; // Optimized size for crisp thumbnails and fast loading
         let width = img.width;
         let height = img.height;
 
@@ -45,7 +45,7 @@ const compressImage = (file) => {
           } else {
             resolve(file);
           }
-        }, 'image/jpeg', 0.7); // 0.7 quality is extremely lightweight and fast to fetch
+        }, 'image/jpeg', 0.6); // 0.6 quality results in tiny ~10KB file sizes
       };
       img.onerror = () => resolve(file);
     };
