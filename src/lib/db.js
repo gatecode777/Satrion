@@ -1,10 +1,11 @@
 import mongoose from 'mongoose';
-import dns from 'node:dns/promises';
+import dns from 'node:dns';
 import Product from '../models/Product';
 import Category from '../models/Category';
 
-// Fix Windows SRV DNS lookup failures for MongoDB Atlas
-dns.setServers(['1.1.1.1']);
+// Fix Windows SRV DNS lookup failures and broken IPv6 network hangs for MongoDB Atlas
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+dns.setDefaultResultOrder('ipv4first');
 
 
 let cached = global.mongoose;
@@ -60,7 +61,7 @@ if (!global.dbCache) {
 }
 
 export async function getCachedData() {
-  const CACHE_TTL = 15 * 1000; // 15 seconds TTL
+  const CACHE_TTL = 5 * 60 * 1000; // 5 minutes TTL in memory to prevent slow Atlas DB handshakes
   const now = Date.now();
   const cache = global.dbCache;
 
@@ -72,7 +73,7 @@ export async function getCachedData() {
 
   const [categories, products] = await Promise.all([
     Category.find({ isActive: { $ne: false } }).lean(),
-    Product.find({ isActive: { $ne: false } }).select('-image').lean()
+    Product.find({ isActive: { $ne: false } }).lean()
   ]);
 
   cache.categories = categories;

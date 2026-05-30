@@ -31,7 +31,7 @@ const getNumericPrice = (p) => {
 };
 
 
-const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems = 0, totalProductsCount = 0 }) => {
+const ShopClient = ({ allCategories = [], allProducts = [] }) => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -42,9 +42,6 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
   const minPriceParam = parseInt(searchParams?.get('minPrice') || '50000', 10);
   const maxPriceParam = parseInt(searchParams?.get('maxPrice') || '200000', 10);
 
-  const [dbProducts, setDbProducts] = useState(initialProducts);
-  const [dbCategories, setDbCategories] = useState(initialCategories);
-  
   const [selectedCategory, setSelectedCategory] = useState(categoryParam);
   const [sortBy, setSortBy] = useState(sortParam);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
@@ -74,14 +71,6 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
   const [localSearch, setLocalSearch] = useState(searchQuery);
 
   useEffect(() => {
-    setDbProducts(initialProducts);
-  }, [initialProducts]);
-
-  useEffect(() => {
-    setDbCategories(initialCategories);
-  }, [initialCategories]);
-
-  useEffect(() => {
     setSelectedCategory(categoryParam);
     setSortBy(sortParam);
     setCurrentPage(pageParam);
@@ -102,6 +91,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
   }, []);
 
   const updateFilters = (newParams) => {
+    if (typeof window === 'undefined') return;
     const params = new URLSearchParams(window.location.search);
     Object.entries(newParams).forEach(([key, value]) => {
       if (value === null || value === undefined || value === 'All' || (key === 'q' && !value)) {
@@ -110,13 +100,66 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
         params.set(key, value);
       }
     });
-    router.push(`/shop?${params.toString()}`, { scroll: false });
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.pushState({ path: newUrl }, '', newUrl);
   };
 
   const handleCategorySelect = (categoryName) => {
     setSelectedCategory(categoryName);
+    setCurrentPage(1);
     updateFilters({ category: categoryName, page: 1 });
   };
+
+  // 1. Filter by category
+  let filtered = allProducts;
+  if (selectedCategory !== 'All') {
+    filtered = filtered.filter(p => p.category === selectedCategory);
+  }
+
+  // 2. Filter by search query (localSearch / search bar)
+  if (localSearch) {
+    const qLower = localSearch.toLowerCase();
+    filtered = filtered.filter(p => 
+      (p.name && p.name.toLowerCase().includes(qLower)) || 
+      (p.description && p.description.toLowerCase().includes(qLower)) || 
+      (p.category && p.category.toLowerCase().includes(qLower))
+    );
+  }
+
+  // 3. Filter by price
+  filtered = filtered.filter(p => {
+    const numericPrice = getNumericPrice(p.price);
+    return numericPrice >= minPrice && numericPrice <= maxPrice;
+  });
+
+  // Calculate sidebar counts dynamically for the active filtered items
+  const countsMap = {};
+  // Count categories of products that match search & price filters
+  // but WITHOUT category filter itself, so the user can see counts in other categories
+  let forCounts = allProducts.filter(p => {
+    const numericPrice = getNumericPrice(p.price);
+    const matchesPrice = numericPrice >= minPrice && numericPrice <= maxPrice;
+    let matchesSearch = true;
+    if (localSearch) {
+      const qLower = localSearch.toLowerCase();
+      matchesSearch = (p.name && p.name.toLowerCase().includes(qLower)) || 
+                      (p.description && p.description.toLowerCase().includes(qLower)) || 
+                      (p.category && p.category.toLowerCase().includes(qLower));
+    }
+    return matchesPrice && matchesSearch;
+  });
+
+  forCounts.forEach(p => {
+    countsMap[p.category] = (countsMap[p.category] || 0) + 1;
+  });
+
+  const totalProductsCount = forCounts.length;
+  const totalItems = filtered.length;
+
+  const dbCategories = allCategories.map(cat => ({
+    ...cat,
+    count: countsMap[cat.name] || 0
+  }));
 
   // Dynamically compute active categories for the top bar and sidebar
   const categories = [
@@ -127,8 +170,22 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
     }))
   ];
 
-  const paginatedProducts = dbProducts;
+  // 4. Sort products
+  let sorted = [...filtered];
+  if (sortBy === 'A to Z') {
+    sorted.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  } else if (sortBy === 'Price: Low to High') {
+    sorted.sort((a, b) => getNumericPrice(a.price) - getNumericPrice(b.price));
+  } else if (sortBy === 'Price: High to Low') {
+    sorted.sort((a, b) => getNumericPrice(b.price) - getNumericPrice(a.price));
+  } else {
+    // Featured / default: sort by createdAt descending
+    sorted.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+  }
+
+  // 5. Paginate products
   const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
+  const paginatedProducts = sorted.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const getPageNumbers = () => {
     const pages = [];
@@ -166,6 +223,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
 
   const handleSortChange = (e) => {
     setSortBy(e.target.value);
+    setCurrentPage(1);
     updateFilters({ sort: e.target.value, page: 1 });
   };
 
@@ -1085,7 +1143,9 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
                   setMinPrice(50000);
                   setMaxPrice(200000);
                   setSelectedCategory('All');
-                  updateFilters({ minPrice: 50000, maxPrice: 200000, category: 'All', page: 1 });
+                  setLocalSearch('');
+                  setCurrentPage(1);
+                  updateFilters({ minPrice: 50000, maxPrice: 200000, category: 'All', q: '', page: 1 });
                 }}
                 className="btn w-100 d-flex align-items-center justify-content-center gap-2"
                 style={{
@@ -1107,6 +1167,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
                   e.currentTarget.style.color = '#64748b';
                 }}
               >
+                <i className="fas fa-undo"></i> Reset Filters
               </button>
             </div>
           </div>
@@ -1137,7 +1198,7 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
               </button>
 
               {/* Search Capsule Input Form */}
-              <form action="/shop" method="get" className="position-relative flex-grow-1 mb-0">
+              <form onSubmit={(e) => e.preventDefault()} className="position-relative flex-grow-1 mb-0">
                 <i className="fa fa-search position-absolute text-muted" style={{ left: '16px', top: '50%', transform: 'translateY(-50%)', fontSize: '0.9rem' }}></i>
                 <input suppressHydrationWarning={true}
                   type="text"
@@ -1145,7 +1206,11 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
                   className="form-control"
                   placeholder="Search products..."
                   value={localSearch}
-                  onChange={(e) => setLocalSearch(e.target.value)}
+                  onChange={(e) => {
+                    setLocalSearch(e.target.value);
+                    setCurrentPage(1);
+                    updateFilters({ q: e.target.value, page: 1 });
+                  }}
                   style={{
                     paddingLeft: '44px',
                     paddingRight: '16px',
@@ -1162,15 +1227,23 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
                 />
               </form>
             </div>
-            {searchQuery && (
+            {localSearch && (
               <div className="alert alert-light border shadow-sm d-flex justify-content-between align-items-center mb-4 text-dark" style={{ borderRadius: '16px', padding: '16px 24px' }}>
                 <div>
                   <i className="fas fa-search me-2" style={{ color: '#bc79e4' }}></i>
-                  Showing results for "<strong>{searchQuery}</strong>" ({totalItems} items found)
+                  Showing results for "<strong>{localSearch}</strong>" ({totalItems} items found)
                 </div>
-                <Link href="/shop" className="btn btn-sm btn-dark rounded-pill px-3" style={{ fontSize: '0.85rem' }}>
+                <button suppressHydrationWarning={true}
+                  onClick={() => {
+                    setLocalSearch('');
+                    setCurrentPage(1);
+                    updateFilters({ q: '', page: 1 });
+                  }}
+                  className="btn btn-sm btn-dark rounded-pill px-3 bg-dark text-white" 
+                  style={{ fontSize: '0.85rem', border: 'none' }}
+                >
                   Clear Search
-                </Link>
+                </button>
               </div>
             )}
             {/* Top Bar */}
@@ -1757,8 +1830,10 @@ const ShopClient = ({ initialCategories = [], initialProducts = [], totalItems =
                     setMinPrice(50000);
                     setMaxPrice(200000);
                     setSelectedCategory('All');
+                    setLocalSearch('');
+                    setCurrentPage(1);
                     setIsFiltersDrawerOpen(false);
-                    updateFilters({ minPrice: 50000, maxPrice: 200000, category: 'All', page: 1 });
+                    updateFilters({ minPrice: 50000, maxPrice: 200000, category: 'All', q: '', page: 1 });
                   }}
                   className="btn w-100 d-flex align-items-center justify-content-center gap-2"
                   style={{
