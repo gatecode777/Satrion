@@ -184,29 +184,16 @@ export default function AdminProducts() {
     setShowModal(true);
   };
 
-  const openEdit = async (p) => {
+  const openEdit = (p) => {
     setEditTarget(p);
-    // Pre-populate form immediately (without image — it's not in list response)
     setForm({
       name: p.name || '', price: p.price?.toString() || '',
       originalPrice: p.originalPrice?.toString() || '', description: p.description || '',
-      image: '', category: p.category || '',
+      image: p.image || '', category: p.category || '',
       brand: p.brand || '', stock: p.stock?.toString() || '0',
       homepageSection: p.homepageSection || 'None',
     });
     setShowModal(true);
-    // Fetch image on-demand (lightweight single product fetch)
-    try {
-      const res = await fetch(`/api/admin/products/${p._id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.product?.image) {
-          setForm(prev => ({ ...prev, image: data.product.image }));
-        }
-      }
-    } catch {}
   };
 
   const handleSubmit = async (e) => {

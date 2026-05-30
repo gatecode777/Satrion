@@ -40,11 +40,10 @@ export async function GET(req) {
       query.name = { $regex: search, $options: 'i' };
     }
 
-    // Parallel queries: count + paginated products (NO image field — base64 blobs are huge)
+    // Parallel queries: count + paginated products (includes lightweight base64 image strings)
     const [total, products] = await Promise.all([
       Product.countDocuments(query),
       Product.find(query)
-        .select('-image')
         .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
