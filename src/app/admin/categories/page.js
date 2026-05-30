@@ -227,14 +227,16 @@ export default function AdminCategories() {
 
   const toggleActive = async (cat) => {
     try {
+      const currentActive = cat.isActive !== false;
+      const nextActive = !currentActive;
       const res = await fetch(`/api/admin/categories/${cat._id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ isActive: !cat.isActive }),
+        body: JSON.stringify({ isActive: nextActive }),
       });
       if (!res.ok) throw new Error('Failed to update');
-      toast.success(`Category ${cat.isActive ? 'deactivated' : 'activated'}`);
-      setCategories(categories.map(c => c._id === cat._id ? { ...c, isActive: !c.isActive } : c));
+      toast.success(`Category ${currentActive ? 'deactivated' : 'activated'}`);
+      setCategories(categories.map(c => c._id === cat._id ? { ...c, isActive: nextActive } : c));
     } catch (err) {
       toast.error(err.message);
     }
@@ -275,7 +277,7 @@ export default function AdminCategories() {
                 className="card glass-premium border-0 h-100"
                 style={{
                   borderRadius: '16px',
-                  opacity: cat.isActive ? 1 : 0.55,
+                  opacity: cat.isActive !== false ? 1 : 0.55,
                   transition: 'opacity 0.2s',
                   overflow: 'hidden',
                 }}
@@ -296,8 +298,8 @@ export default function AdminCategories() {
                 <div className="p-3">
                   <div className="d-flex justify-content-between align-items-start mb-2">
                     <h6 className="fw-bold text-white mb-0">{cat.name}</h6>
-                    <span className={`badge rounded-pill ${cat.isActive ? 'bg-success' : 'bg-secondary'}`} style={{ fontSize: '0.65rem' }}>
-                      {cat.isActive ? 'Active' : 'Hidden'}
+                    <span className={`badge rounded-pill ${cat.isActive !== false ? 'bg-success' : 'bg-secondary'}`} style={{ fontSize: '0.65rem' }}>
+                      {cat.isActive !== false ? 'Active' : 'Hidden'}
                     </span>
                   </div>
                   {cat.description && (
@@ -321,10 +323,10 @@ export default function AdminCategories() {
                     <button
                       onClick={() => toggleActive(cat)}
                       className="btn btn-sm border-0"
-                      style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '8px', color: cat.isActive ? '#f59e0b' : '#22c55e' }}
-                      title={cat.isActive ? 'Deactivate' : 'Activate'}
+                      style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '8px', color: cat.isActive !== false ? '#f59e0b' : '#22c55e' }}
+                      title={cat.isActive !== false ? 'Deactivate' : 'Activate'}
                     >
-                      <i className={`fas ${cat.isActive ? 'fa-eye-slash' : 'fa-eye'}`} />
+                      <i className={`fas ${cat.isActive !== false ? 'fa-eye-slash' : 'fa-eye'}`} />
                     </button>
                     <button
                       onClick={() => handleDelete(cat)}
