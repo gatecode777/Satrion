@@ -4,7 +4,8 @@ import Product from '@/models/Product';
 import Category from '@/models/Category';
 import ShopClient from '@/components/ShopClient';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60; // ISR: rebuild page every 60 seconds
+
 
 // Dynamic SEO metadata based on search parameters
 export async function generateMetadata({ searchParams }) {

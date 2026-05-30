@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
+import dns from 'node:dns/promises';
 import Product from '../models/Product';
 import Category from '../models/Category';
+
+// Fix Windows SRV DNS lookup failures for MongoDB Atlas
+dns.setServers(['1.1.1.1']);
+
 
 let cached = global.mongoose;
 
