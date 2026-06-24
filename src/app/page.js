@@ -1,7 +1,5 @@
 import React from 'react';
-import connectDB, { ensureSeeded } from '@/lib/db';
-import Product from '@/models/Product';
-import Category from '@/models/Category';
+import { getCachedData } from '@/lib/db';
 import HomeClient from '@/components/HomeClient';
 
 // ISR: page is statically cached, refreshes in background every 60 seconds
@@ -21,20 +19,13 @@ export const metadata = {
 };
 
 export default async function Home() {
-  await ensureSeeded();
+  // getCachedData() properly awaits connectDB() and propagates connection errors
+  // instead of silently swallowing them like ensureSeeded() did.
+  const { categories, products: allProducts } = await getCachedData();
 
-  // Fetch registered active categories first
-  const categories = await Category.find({ isActive: { $ne: false } }).lean();
-  const categoryNames = categories.map(c => c.name);
-
-  // Fetch only products belonging to the active categories
-  const products = await Product.find({
-    homepageSection: { 
-      $in: ['Featured Products', 'Bestsellers', 'Our Range of Gaming Products'] 
-    },
-    isActive: { $ne: false },
-    category: { $in: categoryNames }
-  }).sort({ createdAt: -1 }).lean();
+  // Fetch only products belonging to homepage sections
+  const homepageSections = new Set(['Featured Products', 'Bestsellers', 'Our Range of Gaming Products']);
+  const products = allProducts.filter(p => homepageSections.has(p.homepageSection));
 
   // Format MongoDB documents for secure Next.js Server-Client serialization
   const serializedProducts = products.map((p) => {

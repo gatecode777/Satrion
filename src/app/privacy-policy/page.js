@@ -150,31 +150,31 @@ export default function PrivacyPolicy() {
               </div>
             </div>
 
-            {/* Grid of Sections 7-10 */}
+            {/* Grid of Sections 6-9 */}
             <div className="row g-4">
               <div className="col-md-6">
-                <h5 className="fw-bold text-white mb-2">7. User Rights</h5>
+                <h5 className="fw-bold text-white mb-2">6. User Rights</h5>
                 <p className="text-muted small lh-lg mb-0">
                   You possess the privilege to fetch, correct, or request the deletion of your account parameters under local privacy regulations. Submit configuration requests directly to our email.
                 </p>
               </div>
 
               <div className="col-md-6">
-                <h5 className="fw-bold text-white mb-2">8. Third-Party Links</h5>
+                <h5 className="fw-bold text-white mb-2">7. Third-Party Links</h5>
                 <p className="text-muted small lh-lg mb-0">
                   Our site may render external links to delivery dashboards or tech sites. Satrion is not responsible for the privacy setups of these external networks; review their terms upon redirect.
                 </p>
               </div>
 
               <div className="col-md-6">
-                <h5 className="fw-bold text-white mb-2">9. Children's Privacy</h5>
+                <h5 className="fw-bold text-white mb-2">8. Children's Privacy</h5>
                 <p className="text-muted small lh-lg mb-0">
                   Our e-commerce pipeline is restricted to individuals at or above 18 years of age. We do not deliberately index details belonging to minors.
                 </p>
               </div>
 
               <div className="col-md-6">
-                <h5 className="fw-bold text-white mb-2">10. Policy Changes</h5>
+                <h5 className="fw-bold text-white mb-2">9. Policy Changes</h5>
                 <p className="text-muted small lh-lg mb-0">
                   Satrion reserves the right to modify or restructure elements of this policy document. Revised versions are declared active immediately upon their publication here.
                 </p>
@@ -184,7 +184,7 @@ export default function PrivacyPolicy() {
             {/* Contact Info Widget */}
             <div className="p-4 rounded-4 mt-3" style={{ backgroundColor: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(255,255,255,0.06)' }}>
               <h5 className="fw-bold text-info mb-3 d-flex align-items-center gap-2">
-                <i className="far fa-envelope"></i> 11. Contact Information
+                <i className="far fa-envelope"></i> 10. Contact Information
               </h5>
               <p className="text-muted small mb-4">
                 If you have questions, queries, or requests regarding this Privacy Policy document, feel free to contact us:

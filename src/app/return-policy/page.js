@@ -63,7 +63,7 @@ export default function ReturnPolicy() {
               <div className="col-md-6">
                 <div className="card border-0 p-4 h-100" style={{ backgroundColor: 'rgba(59, 130, 246, 0.04)', border: '1px solid rgba(59, 130, 246, 0.15)', borderRadius: '16px' }}>
                   <h5 className="fw-bold text-info mb-3 d-flex align-items-center gap-2">
-                    <i className="fas fa-wallet"></i> 4. Refund Process
+                    <i className="fas fa-wallet"></i> 2. Refund Process
                   </h5>
                   <p className="small text-muted mb-3">Once returned product is received and inspected by our warehouse technicians:</p>
                   <ul className="list-unstyled small text-muted d-flex flex-column gap-2 mb-0">
@@ -106,12 +106,12 @@ export default function ReturnPolicy() {
               </div>
             </div>
 
-            {/* Sections 5-7 Cards */}
+            {/* Sections 3-5 Cards */}
             <div className="row g-3">
               <div className="col-md-4">
                 <div className="p-3.5 rounded-4 h-100" style={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
                   <h6 className="fw-bold text-white mb-2 d-flex align-items-center gap-2">
-                    <i className="fas fa-sync text-info"></i> 5. Replacements
+                    <i className="fas fa-sync text-info"></i> 3. Replacements
                   </h6>
                   <p className="text-muted small mb-0 lh-lg">
                     Request an exchange instead of a refund if the system unit is wrong, damaged, or has defects. Replacements are subject to active catalog stock availability.
@@ -122,7 +122,7 @@ export default function ReturnPolicy() {
               <div className="col-md-4">
                 <div className="p-3.5 rounded-4 h-100" style={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
                   <h6 className="fw-bold text-white mb-2 d-flex align-items-center gap-2">
-                    <i className="fas fa-truck text-info"></i> 6. Return Shipping
+                    <i className="fas fa-truck text-info"></i> 4. Return Shipping
                   </h6>
                   <p className="text-muted small mb-0 lh-lg">
                     Operational logistics require secure packaging. Satrion bears return shipment charges for verified defects or shipping mix-ups. Pack securely to avoid transit breakage.
@@ -133,7 +133,7 @@ export default function ReturnPolicy() {
               <div className="col-md-4">
                 <div className="p-3.5 rounded-4 h-100" style={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
                   <h6 className="fw-bold text-white mb-2 d-flex align-items-center gap-2">
-                    <i className="far fa-times-circle text-info"></i> 7. Cancellations
+                    <i className="far fa-times-circle text-info"></i> 5. Cancellations
                   </h6>
                   <p className="text-muted small mb-0 lh-lg">
                     Order cancellations are accepted prior to shipment confirmation emails. Once handpicked and shipped, cancellations are blocked, and standard returns apply.
@@ -142,11 +142,11 @@ export default function ReturnPolicy() {
               </div>
             </div>
 
-            {/* Section 8 Notes */}
+            {/* Section 6 Notes */}
             <div>
               <div className="d-flex align-items-center gap-2 mb-3 border-bottom pb-2" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
                 <i className="fas fa-triangle-exclamation text-warning fs-5"></i>
-                <h4 className="fw-bold mb-0 text-white">8. Important Notes</h4>
+                <h4 className="fw-bold mb-0 text-white">6. Important Notes</h4>
               </div>
               <ul className="list-unstyled small text-muted d-flex flex-column gap-2 mb-0">
                 <li>• Satrion reserves the right to audit and verify all hardware return and refund claims.</li>
@@ -158,7 +158,7 @@ export default function ReturnPolicy() {
             {/* Contact Us Widget */}
             <div className="p-4 rounded-4 mt-3" style={{ backgroundColor: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(255,255,255,0.06)' }}>
               <h5 className="fw-bold text-info mb-3 d-flex align-items-center gap-2">
-                <i className="far fa-envelope"></i> 9. Contact Us
+                <i className="far fa-envelope"></i> 7. Contact Us
               </h5>
               <p className="text-muted small mb-4">
                 For return requests, exchanges, or refund tracking updates, connect with our support desk:

@@ -141,7 +141,7 @@ export default function TermsConditions() {
               <div className="col-md-6">
                 <div className="p-4 rounded-4 h-100" style={{ backgroundColor: 'rgba(15, 23, 42, 0.4)', border: '1px solid rgba(255,255,255,0.06)' }}>
                   <h5 className="fw-bold text-white mb-2 d-flex align-items-center gap-2">
-                    <i className="fas fa-ban text-info"></i> 9. Limitation of Liability
+                    <i className="fas fa-ban text-info"></i> 8. Limitation of Liability
                   </h5>
                   <p className="text-muted small lh-lg mb-0">
                     Satrion is not liable for any indirect commercial loss, technical downtime, server lags, or data corruptions. Purchasing and assembling hardware parts is executed at the customer's own discretion and risk.
@@ -153,7 +153,7 @@ export default function TermsConditions() {
             {/* Grid of Sections 8, 10-14 */}
             <div className="row g-4">
               <div className="col-md-6">
-                <h5 className="fw-bold text-white mb-2">8. Intellectual Property</h5>
+                <h5 className="fw-bold text-white mb-2">9. Intellectual Property</h5>
                 <p className="text-muted small lh-lg mb-0">
                   All website contents, product images, graphics, vector icons, custom code, and satrion branding remain the property of Satrion and may not be copied without written consent.
                 </p>
