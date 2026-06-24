@@ -44,8 +44,12 @@ async function connectDB() {
   try {
     cached.conn = await cached.promise;
   } catch (e) {
+
     cached.promise = null;
     throw e;
+
+
+
   }
 
   return cached.conn;
@@ -56,6 +60,7 @@ export async function migrateBase64Images() {
   // Disabled: Storing large images locally is not compatible with read-only/serverless platforms like Vercel.
   // Instead, the application now saves highly-compressed, lightweight Base64 strings in the database.
 }
+
 
 // Global memory cache to bypass slow regional database network round trips
 if (!global.dbCache) {
