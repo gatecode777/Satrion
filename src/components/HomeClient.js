@@ -771,23 +771,24 @@ const HomeClient = ({ initialCategories = [], initialProducts = [] }) => {
         <div className="container py-5">
           <div className="row text-center mb-5">
             <div className="col-lg-6 m-auto">
-              <h2 className="h1 fw-bold text-white">Our Services</h2>
-              <p className="text-secondary">We offer a range of IT services to help businesses thrive in the digital age.</p>
+              <h2 className="h1 fw-bold text-white">Why Choose <span style={{ color: '#38bdf8' }}>Satrion</span></h2>
+              <p className="text-secondary">From custom PC builds to premium gaming gear — we deliver performance, quality, and expert support.</p>
             </div>
           </div>
           <div className="row">
             {[
-              { icon: 'fa-codepen', title: 'Web Development' },
-              { icon: 'fa-handshake', title: 'IT Support' },
-              { icon: 'fa-rocketchat', title: 'IT Personal Services' },
-              { icon: 'fa-user', title: '24 Hours Service' }
+              { icon: 'fa-screwdriver-wrench', title: 'Custom PC Builds', desc: 'Hand-assembled gaming rigs tailored to your budget and performance goals.' },
+              { icon: 'fa-microchip', title: 'Premium Components', desc: 'Curated CPUs, GPUs, RAM, and storage from top-tier brands.' },
+              { icon: 'fa-headset', title: 'Expert Tech Support', desc: 'Our team helps you choose, configure, and troubleshoot your setup.' },
+              { icon: 'fa-truck-fast', title: 'Fast Dispatch', desc: 'Quick order processing with tracked shipping across India.' }
             ].map((srv, idx) => (
               <div className="col-md-6 col-lg-3 mb-4" key={idx}>
                 <div className="h-100 py-5 px-3 text-center rounded-4 hover-lift" style={{ backgroundColor: '#1a1a1a', border: '1px solid #262626' }}>
-                  <div className="d-inline-flex align-items-center justify-content-center bg-black rounded-circle mb-4" style={{ width: '80px', height: '80px' }}>
-                    <i className={`fa-solid ${srv.icon} fa-2x text-white`}></i>
+                  <div className="d-inline-flex align-items-center justify-content-center rounded-circle mb-4" style={{ width: '80px', height: '80px', background: 'linear-gradient(135deg, rgba(56,189,248,0.15), rgba(56,189,248,0.05))', border: '1px solid rgba(56,189,248,0.2)' }}>
+                    <i className={`fa-solid ${srv.icon} fa-2x`} style={{ color: '#38bdf8' }}></i>
                   </div>
-                  <h5 className="text-white fw-bold">{srv.title}</h5>
+                  <h5 className="text-white fw-bold mb-2">{srv.title}</h5>
+                  <p className="text-secondary small mb-0">{srv.desc}</p>
                 </div>
               </div>
             ))}
