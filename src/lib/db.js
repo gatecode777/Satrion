@@ -49,6 +49,7 @@ async function connectDB() {
   }
 
   return cached.conn;
+  s
 }
 
 export async function migrateBase64Images() {
